@@ -41,27 +41,23 @@ async def exalt(ctx):
     await ctx.send(returnStatement)
 
 @bot.command(name="c")
-async def currency(ctx, arg1):
+async def chaosEquivalent(ctx, *args):
+    requested_currency = " ".join(args)
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
-
     r = requests.get(request_string)
+    currency_dict = {}  # dict format -- name: [correct name: chaos equivalent]
     for currency in r.json()['lines']:
-        if arg1 in ["mavens", "maven's"]:
-            if currency['currencyTypeName'] == "Maven's Orb":
-                returnStatement = currency['currencyTypeName'] + 's' + ' are currently worth ' + str(currency['chaosEquivalent']) + " chaos orbs."
-        elif arg1 in ["awakeners", "awakener's"]:
-            if currency['currencyTypeName'] == "Awakener's Orb":
-                returnStatement = currency['currencyTypeName'] + 's' + ' are currently worth ' + str(currency['chaosEquivalent']) + " chaos orbs."
-        elif arg1 in ["mirror"]:
-            if currency['currencyTypeName'] == "Mirror of Kalandra":
-                returnStatement = currency['currencyTypeName'] + 's' + ' are currently worth ' + str(currency['chaosEquivalent']) + " chaos orbs."
-        elif arg1 in ["regret"]:
-            if currency['currencyTypeName'] == "Orb of Regret":
-                returnStatement = currency['currencyTypeName'] + 's' + ' are currently worth ' + str(currency['chaosEquivalent']) + " chaos orbs."
-        elif arg1 in ["whetstone"]:
-            if currency['currencyTypeName'] == "Blacksmith's Whetstone":
-                returnStatement = currency['currencyTypeName'] + 's' + ' are currently worth ' + str(currency['chaosEquivalent']) + " chaos orbs."
-    await ctx.send(returnStatement)
+        simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
+        currency_dict[simplified_name] = [currency['currencyTypeName'], str(currency['chaosEquivalent'])]
+        currency_dict[currency['currencyTypeName']] = str(currency['chaosEquivalent'])
+
+    try:
+        return_statement = currency_dict[requested_currency][0] + '\'s' + " are worth " + "**" + currency_dict[requested_currency][1] + "**" + " chaos orbs."
+        await ctx.send(return_statement)
+    except:
+        return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
+        await ctx.send(return_statement)
+
 @bot.command(name="bf")  # bottled faith
 async def bf(ctx):
     request_string = 'https://poe.ninja/api/data/ItemOverview?league=Ritual&type=UniqueFlask&language=en'
