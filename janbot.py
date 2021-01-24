@@ -27,10 +27,12 @@ with open("interviewquestions.txt") as f:
 for path in richardPicDir:
     richardPics.append(path.replace("\\", "/"))
 
+current_league = "Ritual"
+
 
 @bot.command(name="exalt")
 async def exalt(ctx):
-    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
+    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
     for currency in r.json()['lines']:
         if currency['currencyTypeName'] == "Exalted Orb":
@@ -41,13 +43,14 @@ async def exalt(ctx):
 @bot.command(name="c", aliases=["chaos"])
 async def chaosEquivalent(ctx, *args):
     requested_currency = " ".join(args)
-    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
+    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
     currency_dict = {}  # dict format -- name: [correct name: chaos equivalent]
     for currency in r.json()['lines']:
         simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
-        currency_dict[simplified_name] = [currency['currencyTypeName'], str(currency['chaosEquivalent'])]
-        currency_dict[currency['currencyTypeName']] = [currency['currencyTypeName'], str(currency['chaosEquivalent'])]
+        price = [currency['currencyTypeName'], str(currency['chaosEquivalent'])]
+        currency_dict[simplified_name] = price
+        currency_dict[currency['currencyTypeName']] = price
     try:
         return_statement = currency_dict[requested_currency][0] + '\'s' + " are worth " + "**" + currency_dict[requested_currency][1] + "**" + " chaos orbs."
         await ctx.send(return_statement)
@@ -59,7 +62,7 @@ async def chaosEquivalent(ctx, *args):
 @bot.command(name="e")
 async def exaltEquivalent(ctx, *args):
     requested_currency = " ".join(args)
-    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
+    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
 
     for currency in r.json()['lines']:
@@ -70,8 +73,8 @@ async def exaltEquivalent(ctx, *args):
     currency_dict = {}  # dict format -- name: [correct name: exalt equivalent]
     for currency in r.json()['lines']:
         simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
-        currency_dict[simplified_name] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 5))]
-        currency_dict[currency['currencyTypeName']] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 5))]
+        currency_dict[simplified_name] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 2))]
+        currency_dict[currency['currencyTypeName']] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 2))]
     try:
         return_statement = currency_dict[requested_currency][0] + '\'s' + " are worth " + "**" + currency_dict[requested_currency][1] + "**" + " exalted orbs."
         await ctx.send(return_statement)
@@ -83,7 +86,7 @@ async def exaltEquivalent(ctx, *args):
 @bot.command(name="ec", aliases=["ce"])
 async def exaltChaosEquivalent(ctx, *args):
     requested_currency = " ".join(args)
-    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
+    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
 
     for currency in r.json()['lines']:
@@ -91,7 +94,7 @@ async def exaltChaosEquivalent(ctx, *args):
             exalt_value = currency['chaosEquivalent']
             break
 
-    currency_dict = {}  # dict format -- name: [correct name, exalt quotient, chaos remainder]
+    currency_dict = {}  # dict format -- {name: [correct name, exalt quotient, chaos remainder]}
     for currency in r.json()['lines']:
         simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
         currency_dict[simplified_name] = [currency['currencyTypeName'], str(currency['chaosEquivalent'] // exalt_value), str(round(currency['chaosEquivalent'] % exalt_value))]
@@ -107,23 +110,12 @@ async def exaltChaosEquivalent(ctx, *args):
 
 @bot.command(name="bf")  # bottled faith
 async def bf(ctx):
-    request_string = 'https://poe.ninja/api/data/ItemOverview?league=Ritual&type=UniqueFlask&language=en'
+    request_string = 'https://poe.ninja/api/data/ItemOverview?league={}&type=UniqueFlask&language=en'.format(current_league)
     r = requests.get(request_string)
     for item in r.json()['lines']:
         if item['name'] == "Bottled Faith":
             returnStatement = item['name'] + 's' + ' are currently worth ' + str(item['chaosValue'] + " chaos orbs.")
     await ctx.send(returnStatement)
-'''
-@bot.command(name="currency")
-async def currency(ctx):
-    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
-    r = requests.get(request_string)
-    returnStatement = ""
-    for currency in r.json()['lines']:
-        returnStatement = currency['currencyTypeName'] +'s' + ' are currently worth ' + str(currency['chaosEquivalent']) + " chaos orbs."
-        await ctx.send(returnStatement)
-'''
-
 
 @bot.command(name="hello")
 async def hello(ctx):
