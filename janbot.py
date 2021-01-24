@@ -128,10 +128,6 @@ async def burger(ctx):
 async def sike(ctx):
     await ctx.send(file=discord.File('images/sike.png'))
 
-@bot.command(name="whitepower")
-async def whitepower(ctx):
-    await ctx.send(file=discord.File('richardpics/richard10.jpg'))
-
 @bot.command(name="!question")
 async def interviewquestion(ctx):
     await ctx.send(random.choice(interviewQuestions))
