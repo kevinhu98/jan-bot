@@ -27,10 +27,6 @@ with open("interviewquestions.txt") as f:
 for path in richardPicDir:
     richardPics.append(path.replace("\\", "/"))
 
-@bot.command(name="chaos")
-async def chaos(ctx):
-    await ctx.send("Chaos Orbs are worth 1 chaos orbs.")
-
 @bot.command(name="exalt")
 async def exalt(ctx):
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
@@ -40,7 +36,7 @@ async def exalt(ctx):
             returnStatement = currency['currencyTypeName'] +'s' + ' are currently worth ' + str(currency['chaosEquivalent']) + " chaos orbs."
     await ctx.send(returnStatement)
 
-@bot.command(name="c")
+@bot.command(aliases=["c","chaos"])
 async def chaosEquivalent(ctx, *args):
     requested_currency = " ".join(args)
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
@@ -49,10 +45,32 @@ async def chaosEquivalent(ctx, *args):
     for currency in r.json()['lines']:
         simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
         currency_dict[simplified_name] = [currency['currencyTypeName'], str(currency['chaosEquivalent'])]
-        currency_dict[currency['currencyTypeName']] = str(currency['chaosEquivalent'])
-
+        currency_dict[currency['currencyTypeName']] = [currency['currencyTypeName'], str(currency['chaosEquivalent'])]
     try:
         return_statement = currency_dict[requested_currency][0] + '\'s' + " are worth " + "**" + currency_dict[requested_currency][1] + "**" + " chaos orbs."
+        await ctx.send(return_statement)
+    except:
+        return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
+        await ctx.send(return_statement)
+
+@bot.command(aliases=["e"])
+async def exaltEquivalent(ctx, *args):
+    requested_currency = " ".join(args)
+    request_string = 'https://poe.ninja/api/data/CurrencyOverview?league=Ritual&type=Currency&language=en'
+    r = requests.get(request_string)
+
+    for currency in r.json()['lines']:
+        if currency['currencyTypeName'] == "Exalted Orb":
+            exalt_value = currency['chaosEquivalent']
+            break
+
+    currency_dict = {}  # dict format -- name: [correct name: chaos equivalent]
+    for currency in r.json()['lines']:
+        simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
+        currency_dict[simplified_name] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 5))]
+        currency_dict[currency['currencyTypeName']] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 5))]
+    try:
+        return_statement = currency_dict[requested_currency][0] + '\'s' + " are worth " + "**" + currency_dict[requested_currency][1] + "**" + " exalted orbs."
         await ctx.send(return_statement)
     except:
         return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
