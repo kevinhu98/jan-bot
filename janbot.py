@@ -21,13 +21,44 @@ bot = commands.Bot(command_prefix='')
 richardPicDir = glob.glob("richardpics/*")
 richardPics = []
 
-with open("interviewquestions.txt") as f:
+with open("text_file_resources/interviewquestions.txt") as f:
     interviewQuestions = [question for question in f]
 
 for path in richardPicDir:
     richardPics.append(path.replace("\\", "/"))
 
+
 current_league = "Ritual"
+item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
+                    "Oil", "Incubator", "Scarab", "SkillGem","Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
+
+
+#to do: add remaining item type routes [fragments, ..], figure out how to display linked items, auto update current_league, error messages
+
+@bot.command(name="ci")
+async def item_chaos_price(ctx, *args):
+    requested_item = " ".join(args)
+    for type in item_type_routes:
+        request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
+        r = requests.get(request_string)
+        for item in r.json()['lines']:
+            if item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
+                return_statement = item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
+                await ctx.send(return_statement)
+                return
+
+
+@bot.command(name="ei")
+async def item_chaos_price(ctx, *args):
+    requested_item = " ".join(args)
+    for type in item_type_routes:
+        request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
+        r = requests.get(request_string)
+        for item in r.json()['lines']:
+            if item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
+                return_statement = item['name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
+                await ctx.send(return_statement)
+                return
 
 
 @bot.command(name="exalt")
@@ -107,6 +138,8 @@ async def exaltChaosEquivalent(ctx, *args):
         return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
         await ctx.send(return_statement)
 
+
+#@bot.command()
 
 @bot.command(name="bf")  # bottled faith
 async def bf(ctx):
