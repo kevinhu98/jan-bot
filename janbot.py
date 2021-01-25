@@ -16,7 +16,7 @@ token = os.getenv('DISCORD_TOKEN')
 login = robin_stocks.login(os.getenv('ROBINHOOD_LOGIN'),os.getenv('ROBINHOOD_PW'))
 
 
-bot = commands.Bot(command_prefix='')
+bot = commands.Bot(command_prefix='', help_command=None)
 
 richardPicDir = glob.glob("richardpics/*")
 richardPics = []
@@ -34,6 +34,19 @@ item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAcc
 
 
 #to do: add remaining item type routes [fragments, ..], figure out how to display linked items, auto update current_league, error messages
+
+@bot.command(name="help")
+async def help(ctx):
+    embedVar = discord.Embed(title="Janbot Commands", description="look at that boy go", color=0xff0000)
+    embedVar.add_field(name="c 'currency'", value="Returns the chaos orb equivalent of currency", inline=False)
+    embedVar.add_field(name="e 'currency'", value="Returns the exalted orb equivalent of currency", inline=False)
+    embedVar.add_field(name="ce 'currency'", value="Returns the total exalted and chaos orb equivalent of currency", inline=False)
+    embedVar.add_field(name="ci 'item'", value="Returns the chaos orb equivalent of item", inline=False)
+    embedVar.add_field(name="ei 'item'", value="Returns the exalted orb equivalent of item", inline=False)
+    embedVar.add_field(name="!stonks", value="Displays portfolio value", inline=False)
+    embedVar.add_field(name="!positions", value="Displays account positions", inline=False)
+    embedVar.add_field(name="!richard", value="Random richard picture", inline=False)
+    await ctx.send(embed=embedVar)
 
 @bot.command(name="ci")
 async def item_chaos_price(ctx, *args):
@@ -138,17 +151,6 @@ async def exaltChaosEquivalent(ctx, *args):
         return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
         await ctx.send(return_statement)
 
-
-#@bot.command()
-
-@bot.command(name="bf")  # bottled faith
-async def bf(ctx):
-    request_string = 'https://poe.ninja/api/data/ItemOverview?league={}&type=UniqueFlask&language=en'.format(current_league)
-    r = requests.get(request_string)
-    for item in r.json()['lines']:
-        if item['name'] == "Bottled Faith":
-            returnStatement = item['name'] + 's' + ' are currently worth ' + str(item['chaosValue'] + " chaos orbs.")
-    await ctx.send(returnStatement)
 
 @bot.command(name="hello")
 async def hello(ctx):
