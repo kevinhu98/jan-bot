@@ -41,7 +41,7 @@ async def help(ctx):
     embedVar.add_field(name="c 'currency'", value="Returns the chaos orb equivalent of currency", inline=False)
     embedVar.add_field(name="e 'currency'", value="Returns the exalted orb equivalent of currency", inline=False)
     embedVar.add_field(name="ce 'currency'", value="Returns the total exalted and chaos orb equivalent of currency", inline=False)
-    embedVar.add_field(name="ci 'item'", value="Returns the chaos orb equivalent of item", inline=False)
+    embedVar.add_field(name="ci 'item' 'optional: 0l,5l,6l'", value="Returns the chaos orb equivalent of item", inline=False)
     embedVar.add_field(name="ei 'item'", value="Returns the exalted orb equivalent of item", inline=False)
     embedVar.add_field(name="!stonks", value="Displays portfolio value", inline=False)
     embedVar.add_field(name="!positions", value="Displays account positions", inline=False)
@@ -54,11 +54,27 @@ async def item_chaos_price(ctx, *args):
     for type in item_type_routes:
         request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
         r = requests.get(request_string)
-        for item in r.json()['lines']:
-            if item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
-                return_statement = item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
-                await ctx.send(return_statement)
-                return
+        if type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
+            if (requested_item[-2:] in ["0L", "0l", "5L", "5l", "6l", "6L"]):  # checking for specific linkage (0,5,6)
+                links = requested_item[-2:]  # last two chars are the num links
+                requested_item_name = requested_item[:-3]  # strip the num links and whitespace
+                for item in r.json()['lines']:
+                    if (item['name'].replace("'", "").lower() in [requested_item_name, requested_item_name.replace("'", "").lower()]) and str(item['links']) == str(requested_item[-2]):
+                        return_statement = "A " + str(item['links']) + " linked " + item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
+                        await ctx.send(return_statement)
+                        return
+            else:  # if no listed links, assume 0 links
+                for item in r.json()['lines']:
+                    if (item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'","").lower()]) and str(item['links']) == str(0):
+                        return_statement = "A " + str(item['links']) + " linked " + item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
+                        await ctx.send(return_statement)
+                        return
+        else:  # otherwise, links don't matter
+            for item in r.json()['lines']:
+                if item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
+                    return_statement = item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
+                    await ctx.send(return_statement)
+                    return
 
 
 @bot.command(name="ei")
