@@ -55,7 +55,7 @@ async def item_chaos_price(ctx, *args):
         request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
         r = requests.get(request_string)
         if type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
-            if (requested_item[-2:] in ["0L", "0l", "5L", "5l", "6l", "6L"]):  # checking for specific linkage (0,5,6)
+            if requested_item[-2:] in ["0L", "0l", "5L", "5l", "6l", "6L"]:  # checking for specific linkage (0,5,6)
                 links = requested_item[-2:]  # last two chars are the num links
                 requested_item_name = requested_item[:-3]  # strip the num links and whitespace
                 for item in r.json()['lines']:
@@ -76,9 +76,11 @@ async def item_chaos_price(ctx, *args):
                     await ctx.send(return_statement)
                     return
 
+    return_statement = "Cannot find: " + requested_item + ". \n" + "Please make sure that you are typing the full name of the item."
+    await ctx.send(return_statement)
 
 @bot.command(name="ei")
-async def item_chaos_price(ctx, *args):
+async def item_exalt_price(ctx, *args):
     requested_item = " ".join(args)
     for type in item_type_routes:
         request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
@@ -243,5 +245,13 @@ async def positions(ctx):  # portfolio
     for key, value in my_stocks.items():
         positions += "".join((key + ", " + "Price: " + str(round(float(value["price"]), 2)) + "," + " Quantity: " + str(round(float(value["quantity"]))))) + "\n"
     await ctx.send(positions)
+
+@bot.command(name="random")
+async def positions(ctx, *args):
+    if len(args) != 2:
+        await ctx.send('must be two numbers dummy')
+    else:
+        random_num = random.randrange(int(args[0]), int(args[1]))
+        await ctx.send(random_num)
 
 bot.run(token)
