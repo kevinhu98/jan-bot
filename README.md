@@ -7,5 +7,3 @@ Current Features:
 * Return Chaos Orb equivalent for Path of Exile items
 * Return a random interview question
 
-Commands:
-TODO
