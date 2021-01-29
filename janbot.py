@@ -3,35 +3,51 @@ import os
 import discord
 import robin_stocks
 import requests
-import re
 from discord.ext import commands
 from dotenv import load_dotenv
-
+import praw
+from praw.models import MoreComments
 import glob
 import random
-
+import sys
 load_dotenv()
+
+
+# setting up discord api info
 token = os.getenv('DISCORD_TOKEN')
 
+
+# setting up robinhood api info
 login = robin_stocks.login(os.getenv('ROBINHOOD_LOGIN'),os.getenv('ROBINHOOD_PW'))
 
 
-bot = commands.Bot(command_prefix='', help_command=None)
-
+# setting up richard image paths
 richardPicDir = glob.glob("richardpics/*")
 richardPics = []
-
-with open("text_file_resources/interviewquestions.txt") as f:
-    interviewQuestions = [question for question in f]
-
 for path in richardPicDir:
     richardPics.append(path.replace("\\", "/"))
 
 
+# setting up interview questions
+with open("text_file_resources/interviewquestions.txt") as f:
+    interviewQuestions = [question for question in f]
+
+
+# setting up poe ninja routes and league info
 current_league = "Ritual"
 item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
-                    "Oil", "Incubator", "Scarab", "SkillGem","Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
+                    "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
 
+
+# setting up a read-only reddit instance
+reddit = praw.Reddit(
+     client_id= os.getenv('REDDIT_CLIENT_ID'),
+     client_secret= os.getenv('REDDIT_CLIENT_SECRET'),
+     user_agent="my user agent"
+)
+
+
+bot = commands.Bot(command_prefix='', help_command=None)
 
 #to do: add remaining item type routes [fragments, ..], figure out how to display linked items, auto update current_league, error messages
 
@@ -85,11 +101,36 @@ async def item_exalt_price(ctx, *args):
     for type in item_type_routes:
         request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
         r = requests.get(request_string)
-        for item in r.json()['lines']:
-            if item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
-                return_statement = item['name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
-                await ctx.send(return_statement)
-                return
+        if type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
+            if requested_item[-2:] in ["0L", "0l", "5L", "5l", "6l", "6L"]:  # checking for specific linkage (0,5,6)
+                links = requested_item[-2:]  # last two chars are the num links
+                requested_item_name = requested_item[:-3]  # strip the num links and whitespace
+                for item in r.json()['lines']:
+                    if (item['name'].replace("'", "").lower() in [requested_item_name, requested_item_name.replace("'",
+                                                                                                                   "").lower()]) and str(
+                            item['links']) == str(requested_item[-2]):
+                        return_statement = "A " + str(item['links']) + " linked " + item[
+                            'name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
+                        await ctx.send(return_statement)
+                        return
+            else:  # if no listed links, assume 0 links
+                for item in r.json()['lines']:
+                    if (item['name'].replace("'", "").lower() in [requested_item,
+                                                                  requested_item.replace("'", "").lower()]) and str(
+                            item['links']) == str(0):
+                        return_statement = "A " + str(item['links']) + " linked " + item[
+                            'name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
+                        await ctx.send(return_statement)
+                        return
+        else:  # otherwise, links don't matter
+            for item in r.json()['lines']:
+                if item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
+                    return_statement = item['name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
+                    await ctx.send(return_statement)
+                    return
+
+    return_statement = "Cannot find: " + requested_item + ". \n" + "Please make sure that you are typing the full name of the item."
+    await ctx.send(return_statement)
 
 
 @bot.command(name="exalt")
@@ -170,9 +211,10 @@ async def exaltChaosEquivalent(ctx, *args):
         await ctx.send(return_statement)
 
 
-@bot.command(name="hello")
+@bot.command(name="hello", aliases=["Hello", "Hi", "hi"])
 async def hello(ctx):
-    await ctx.send("im janbot")
+    return_string = "Hello, " + ctx.message.author.name
+    await ctx.send(return_string)
 
 
 @bot.command(name="choke")
@@ -197,9 +239,7 @@ async def richardree(ctx):
 
 @bot.command(name='gunmo')
 async def gunmo(ctx):
-
     response = ("<@" + str(121871886673117184) + ">" + "\n")
-
     await ctx.send(response)
 
 
@@ -246,6 +286,7 @@ async def positions(ctx):  # portfolio
         positions += "".join((key + ", " + "Price: " + str(round(float(value["price"]), 2)) + "," + " Quantity: " + str(round(float(value["quantity"]))))) + "\n"
     await ctx.send(positions)
 
+
 @bot.command(name="random")
 async def positions(ctx, *args):
     if len(args) != 2:
@@ -254,4 +295,28 @@ async def positions(ctx, *args):
         random_num = random.randrange(int(args[0]), int(args[1]))
         await ctx.send(random_num)
 
+
+@bot.command(name="wsb")
+async def positions(ctx):
+    post_number = 1
+    limit = 20
+    await ctx.send("Here are the top {} hot posts on wsb:".format(limit))
+    for submission in reddit.subreddit("wallstreetbets").hot(limit=limit):
+        post_number_return_string = "The current post number: " + str(post_number_return_string)
+        await ctx.send()
+        for top_level_comment in submission.comments:
+            try:
+                return_statement = top_level_comment.body + str(top_level_comment.score)
+                await ctx.send(return_statement)
+            except discord.errors.HTTPException:  # body length too long
+                await ctx.send("2000 length")
+
+@bot.command(name="commit")
+async def death(ctx, arg):
+    authorized = [142739501557481472]
+    if arg == "die" and ctx.message.author.id in authorized:
+        await ctx.send("u have killed me")
+        sys.exit(0)
+    else:
+        await ctx.send("woosh u missed")
 bot.run(token)
