@@ -6,7 +6,6 @@ import requests
 from discord.ext import commands
 from dotenv import load_dotenv
 import praw
-from praw.models import MoreComments
 import glob
 import random
 import sys
@@ -53,6 +52,11 @@ bot = commands.Bot(command_prefix='', help_command=None)
 
 @bot.command(name="help")
 async def help(ctx):
+    """
+    Displays a discord embed object with a list of commands
+    :param ctx:
+    :return: Prints an embed object
+    """
     embedVar = discord.Embed(title="Janbot Commands", description="look at that boy go", color=0xff0000)
     embedVar.add_field(name="c 'currency'", value="Returns the chaos orb equivalent of currency", inline=False)
     embedVar.add_field(name="e 'currency'", value="Returns the exalted orb equivalent of currency", inline=False)
@@ -66,6 +70,12 @@ async def help(ctx):
 
 @bot.command(name="ci")
 async def item_chaos_price(ctx, *args):
+    """
+    Given any item, displays the chaos value of object
+    :param ctx:
+    :param args: first argument is the name of the item, second optional argument is number of links if possible
+    :return: Returns string with chaos value
+    """
     requested_item = " ".join(args)
     for type in item_type_routes:
         request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
@@ -97,6 +107,12 @@ async def item_chaos_price(ctx, *args):
 
 @bot.command(name="ei")
 async def item_exalt_price(ctx, *args):
+    """
+    Given any item, displays the exalt value of object
+    :param ctx:
+    :param args: first argument is the name of the item, second optional argument is number of links if possible
+    :return: Returns string with exalt value
+    """
     requested_item = " ".join(args)
     for type in item_type_routes:
         request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
@@ -135,6 +151,11 @@ async def item_exalt_price(ctx, *args):
 
 @bot.command(name="exalt")
 async def exalt(ctx):
+    """
+    Displays the current chaos value for a single exalt
+    :param ctx:
+    :return: Returns string with chaos value of single exalt
+    """
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
     for currency in r.json()['lines']:
@@ -145,6 +166,12 @@ async def exalt(ctx):
 
 @bot.command(name="c", aliases=["chaos"])
 async def chaosEquivalent(ctx, *args):
+    """
+    Displays the chaos equivalent of any items with "currency" tag
+    :param ctx:
+    :param args: item with "currency" tag (e.g. Orb of Transmutation)
+    :return: Returns string with chaos value of requested currency
+    """
     requested_currency = " ".join(args)
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
@@ -164,6 +191,12 @@ async def chaosEquivalent(ctx, *args):
 
 @bot.command(name="e")
 async def exaltEquivalent(ctx, *args):
+    """
+    Displays the exalt equivalent of any items with "currency" tag
+    :param ctx:
+    :param args: item with "currency" tag (e.g. Orb of Transmutation)
+    :return: Return string with exalt value of requested currency
+    """
     requested_currency = " ".join(args)
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
@@ -188,6 +221,12 @@ async def exaltEquivalent(ctx, *args):
 
 @bot.command(name="ec", aliases=["ce"])
 async def exaltChaosEquivalent(ctx, *args):
+    """
+    Displays the exalt and chaos remainder equivalent of any items with "currency" tag
+    :param ctx:
+    :param args: item with "currency" tag (e.g. Mirror Shard)
+    :return: Return string with exalt and chaos value of requested currency
+    """
     requested_currency = " ".join(args)
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
@@ -209,6 +248,39 @@ async def exaltChaosEquivalent(ctx, *args):
     except:  # make less broad
         return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
         await ctx.send(return_statement)
+
+
+@bot.command(name="!positions")
+async def positions(ctx):  # portfolio
+    """
+    Displays a table of current stock holdings
+    :param ctx:
+    :return: Return string with multiple lines of stocks
+    """
+    my_stocks = robin_stocks.build_holdings()
+    positions = ""
+    for key, value in my_stocks.items():
+        positions += "".join((key + ", " + "Price: " + str(round(float(value["price"]), 2)) + "," + " Quantity: " + str(round(float(value["quantity"]))))) + "\n"
+    await ctx.send(positions)
+
+
+@bot.command(name="!stonks")
+async def stonks(ctx):
+    """
+    Displays current account portfolio
+    :param ctx:
+    :return: Return string with amount in robinhood account
+    """
+    await ctx.send(robin_stocks.profiles.load_portfolio_profile(info="equity"))
+
+
+@bot.command(name="random")
+async def positions(ctx, *args):
+    if len(args) != 2:
+        await ctx.send('must be two numbers dummy')
+    else:
+        random_num = random.randrange(int(args[0]), int(args[1]))
+        await ctx.send(random_num)
 
 
 @bot.command(name="hello", aliases=["Hello", "Hi", "hi"])
@@ -273,30 +345,10 @@ async def interviewquestion(ctx):
     await ctx.send(random.choice(interviewQuestions))
 
 
-@bot.command(name="!stonks")
-async def stonks(ctx):  # portfolio
-    await ctx.send(robin_stocks.profiles.load_portfolio_profile(info="equity"))
 
-
-@bot.command(name="!positions")
-async def positions(ctx):  # portfolio
-    my_stocks = robin_stocks.build_holdings()
-    positions = ""
-    for key, value in my_stocks.items():
-        positions += "".join((key + ", " + "Price: " + str(round(float(value["price"]), 2)) + "," + " Quantity: " + str(round(float(value["quantity"]))))) + "\n"
-    await ctx.send(positions)
-
-
-@bot.command(name="random")
-async def positions(ctx, *args):
-    if len(args) != 2:
-        await ctx.send('must be two numbers dummy')
-    else:
-        random_num = random.randrange(int(args[0]), int(args[1]))
-        await ctx.send(random_num)
-
-
-@bot.command(name="wsb")
+'''  
+@bot.command(name="wsb")  
+# apparently this already exists
 async def positions(ctx):
     post_number = 1
     limit = 20
@@ -310,9 +362,15 @@ async def positions(ctx):
                 await ctx.send(return_statement)
             except discord.errors.HTTPException:  # body length too long
                 await ctx.send("2000 length")
-
+'''
 @bot.command(name="commit")
 async def death(ctx, arg):
+    """
+    Ends program if user is authorized
+    :param ctx:
+    :param arg:
+    :return: n/a
+    """
     authorized = [142739501557481472]
     if arg == "die" and ctx.message.author.id in authorized:
         await ctx.send("u have killed me")
