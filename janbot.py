@@ -38,6 +38,8 @@ item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAcc
                     "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
 
 
+currency_type_routes = ["Currency", "Fragment"]
+
 # setting up a read-only reddit instance
 reddit = praw.Reddit(
      client_id= os.getenv('REDDIT_CLIENT_ID'),
@@ -77,10 +79,11 @@ async def item_chaos_price(ctx, *args):
     :return: Returns string with chaos value
     """
     requested_item = " ".join(args)
-    for type in item_type_routes:
-        request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
+
+    for item_type in item_type_routes:
+        request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, item_type)
         r = requests.get(request_string)
-        if type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
+        if item_type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
             if requested_item[-2:] in ["0L", "0l", "5L", "5l", "6l", "6L"]:  # checking for specific linkage (0,5,6)
                 links = requested_item[-2:]  # last two chars are the num links
                 requested_item_name = requested_item[:-3]  # strip the num links and whitespace
@@ -102,6 +105,15 @@ async def item_chaos_price(ctx, *args):
                     await ctx.send(return_statement)
                     return
 
+    for currency_type in currency_type_routes:
+        request_string = 'https://poe.ninja/api/data/currencyoverview?league={}&type={}'.format(current_league, currency_type)
+        r = requests.get(request_string)
+        for item in r.json()['lines']:
+            if item['currencyTypeName'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
+                return_statement = item['currencyTypeName'] + ' is currently worth ' + str(item['chaosEquivalent']) + " chaos orbs."
+                await ctx.send(return_statement)
+                return
+
     return_statement = "Cannot find: " + requested_item + ". \n" + "Please make sure that you are typing the full name of the item."
     await ctx.send(return_statement)
 
@@ -114,28 +126,22 @@ async def item_exalt_price(ctx, *args):
     :return: Returns string with exalt value
     """
     requested_item = " ".join(args)
-    for type in item_type_routes:
-        request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, type)
+    for item_type in item_type_routes:
+        request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, item_type)
         r = requests.get(request_string)
-        if type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
+        if item_type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
             if requested_item[-2:] in ["0L", "0l", "5L", "5l", "6l", "6L"]:  # checking for specific linkage (0,5,6)
                 links = requested_item[-2:]  # last two chars are the num links
                 requested_item_name = requested_item[:-3]  # strip the num links and whitespace
                 for item in r.json()['lines']:
-                    if (item['name'].replace("'", "").lower() in [requested_item_name, requested_item_name.replace("'",
-                                                                                                                   "").lower()]) and str(
-                            item['links']) == str(requested_item[-2]):
-                        return_statement = "A " + str(item['links']) + " linked " + item[
-                            'name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
+                    if (item['name'].replace("'", "").lower() in [requested_item_name, requested_item_name.replace("'", "").lower()]) and str(item['links']) == str(requested_item[-2]):
+                        return_statement = "A " + str(item['links']) + " linked " + item['name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
                         await ctx.send(return_statement)
                         return
             else:  # if no listed links, assume 0 links
                 for item in r.json()['lines']:
-                    if (item['name'].replace("'", "").lower() in [requested_item,
-                                                                  requested_item.replace("'", "").lower()]) and str(
-                            item['links']) == str(0):
-                        return_statement = "A " + str(item['links']) + " linked " + item[
-                            'name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
+                    if (item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]) and str(item['links']) == str(0):
+                        return_statement = "A " + str(item['links']) + " linked " + item['name'] + ' is currently worth ' + str(item['exaltedValue']) + " exalted orbs."
                         await ctx.send(return_statement)
                         return
         else:  # otherwise, links don't matter
@@ -345,7 +351,6 @@ async def interviewquestion(ctx):
     await ctx.send(random.choice(interviewQuestions))
 
 
-
 '''  
 @bot.command(name="wsb")  
 # apparently this already exists
@@ -363,6 +368,8 @@ async def positions(ctx):
             except discord.errors.HTTPException:  # body length too long
                 await ctx.send("2000 length")
 '''
+
+
 @bot.command(name="commit")
 async def death(ctx, arg):
     """
