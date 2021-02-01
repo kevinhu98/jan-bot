@@ -9,6 +9,7 @@ import praw
 import glob
 import random
 import sys
+import pymongo
 load_dotenv()
 
 
@@ -47,10 +48,20 @@ reddit = praw.Reddit(
      user_agent="my user agent"
 )
 
+# connect to db
+
+try:
+    client = pymongo.MongoClient("mongodb+srv://kevin:" + os.getenv('MONGO_PW') + "@cluster0.8xh0x.mongodb.net/poe.users?retryWrites=true&w=majority")
+    poe_client = client.poe
+    poe_users = poe_client.users
+    print('Successful connection')
+except:
+    print('no connection')
+
 
 bot = commands.Bot(command_prefix='', help_command=None)
 
-#to do: add remaining item type routes [fragments, ..], figure out how to display linked items, auto update current_league, error messages
+#to do: auto update current_league, update and move to different modules?
 
 @bot.command(name="help")
 async def help(ctx):
@@ -321,7 +332,7 @@ async def gunmo(ctx):
     await ctx.send(response)
 
 
-@bot.command(name="!richard")
+@bot.command(name="richard")
 async def randomRichard(ctx):
     await ctx.send(file=discord.File(random.choice(richardPics)))
 
@@ -331,12 +342,12 @@ async def ryanO(ctx):
     await ctx.send(file=discord.File('images/ryanO.png'))
 
 
-@bot.command(name="!jimothy")
+@bot.command(name="jimothy")
 async def jimothy(ctx):
     await ctx.send(file=discord.File('images/jimothy.png'))
 
 
-@bot.command(name="!burger")
+@bot.command(name="burger")
 async def burger(ctx):
     await ctx.send(file=discord.File('images/burger.jpg'))
 
@@ -384,4 +395,34 @@ async def death(ctx, arg):
         sys.exit(0)
     else:
         await ctx.send("woosh u missed")
+
+@bot.command(name="!register")
+async def register(ctx):
+    requestor_id = ctx.message.author.id
+    if poe_users.find_one({"id": requestor_id}):
+        registered_string = ctx.message.author.name + " is already registered"
+        await ctx.send(registered_string)
+    else:
+        user_to_register = {"id": requestor_id, "items": []}
+        poe_users.insert_one(user_to_register)
+        register_string = ctx.message.author.name + " is now registered"
+        await ctx.send(register_string)
+        print("user has been registered")
+
+'''
+# WIP
+@bot.command(name="!add")
+async def add(ctx, *args):
+    requestor_id = ctx.message.author.id
+    if not poe_users.find_one({"id": requestor_id}):
+        not_registered_string = "You are not currently registered. You can register using **!register**."
+        await ctx.send(not_registered_string)
+    else:
+
+@bot.command(name="id")
+async def id(ctx):
+'''
+
+
+
 bot.run(token)
