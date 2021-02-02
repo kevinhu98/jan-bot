@@ -9,9 +9,11 @@ current_league = "Ritual"
 item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
                     "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
 
+test_type_routes = ["UniqueJewel"]
+
 item_type_to_db = {"UniqueWeapon": "unique_weapons",
                    "DivinationCard": "divination_cards",
-                   "UniqueArmour": "unique_armors",
+                   "UniqueArmour": "unique_armours",
                    "UniqueAccessory": "unique_accessories",
                    "UniqueJewel": "unique_jewels",
                    "UniqueFlask": "unique_flasks",
@@ -20,7 +22,7 @@ item_type_to_db = {"UniqueWeapon": "unique_weapons",
                    "Incubator": "incubators",
                    "Scarab": "scarabs",
                    "SkillGem": "skill_gems",
-                   "Fossil": "fossils", 
+                   "Fossil": "fossils",
                    "Resonator": "resonators",
                    "Prophecy": "prophecies",
                    "Beast": "beasts",
@@ -48,10 +50,11 @@ implicitModifiers
 explicitModifiers
 aliases
 '''
-for item_type in item_type_routes:
+
+for item_type in test_type_routes:
     request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, item_type)
     r = requests.get(request_string)
-    poe_collection = poe_client.get_collection(item_type_to_db[item_type])
+    specific_type_collection = poe_client.get_collection(item_type_to_db[item_type])
     for item in r.json()['lines']:
         item_to_add = {}
         item_to_add['id'] = item['id']
@@ -67,5 +70,6 @@ for item_type in item_type_routes:
         item_to_add['explicitModifiers'] = [item["explicitModifiers"][i]['text'] for i in range(len(item["explicitModifiers"]))]
 
         print(item_to_add)
-        poe_collection.insert_one(item_to_add)
-    break
+        specific_type_collection.insert_one(item_to_add)
+
+

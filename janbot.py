@@ -423,6 +423,34 @@ async def add(ctx, *args):
 async def id(ctx):
 '''
 
+@bot.command(name="id")
+async def id(ctx, *args):
+    requested_item = " ".join(arg.capitalize() for arg in args)
+    item_collections = poe_client.list_collection_names()
+    item_collections.remove("currencies")
+    item_collections.remove("users")
 
+    is_item_found = False
+    for collection_name in item_collections:
+        specific_type_collection = poe_client.get_collection(collection_name)
+        if (specific_type_collection.find_one({"name": requested_item})):
+            is_item_found = True
+            found_item = specific_type_collection.find_one({"name": requested_item})
+            found_item = dict(found_item)
+            break
 
+    if is_item_found:
+        embedVar = discord.Embed(title="Item Search Result", description="uwu", color=0xff0000)
+        embedVar.set_thumbnail(url=found_item['icon'])
+        embedVar.add_field(name="Name", value=found_item['name'], inline=False)
+        embedVar.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
+        for modifier in found_item['implicitModifiers']:
+            embedVar.add_field(name="Explicit: ", value=modifier)
+        for modifier in found_item['explicitModifiers']:
+            embedVar.add_field(name="Implicit: ", value=modifier)
+        await ctx.send(embed=embedVar)
+
+    else:
+        not_found_response = requested_item + " was not found. Please @ADKarry if you think this is an error."
+        await ctx.send(not_found_response)
 bot.run(token)
