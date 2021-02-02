@@ -386,7 +386,7 @@ async def death(ctx, arg):
     """
     Ends program if user is authorized
     :param ctx:
-    :param arg:
+    :param arg: must equal "death"
     :return: n/a
     """
     authorized = [142739501557481472]
