@@ -193,13 +193,14 @@ async def chaosEquivalent(ctx, *args):
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
     currency_dict = {}  # dict format -- name: [correct name: chaos equivalent]
+    simplified_user_request = requested_currency.replace("'", "").lower()
+
     for currency in r.json()['lines']:
         simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
         price = [currency['currencyTypeName'], str(currency['chaosEquivalent'])]
         currency_dict[simplified_name] = price
-        currency_dict[currency['currencyTypeName']] = price
     try:
-        return_statement = currency_dict[requested_currency][0] + '\'s' + " are worth " + "**" + currency_dict[requested_currency][1] + "**" + " chaos orbs."
+        return_statement = currency_dict[simplified_user_request][0] + '\'s' + " are worth " + "**" + currency_dict[simplified_user_request][1] + "**" + " chaos orbs."
         await ctx.send(return_statement)
     except:
         return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
@@ -217,19 +218,18 @@ async def exaltEquivalent(ctx, *args):
     requested_currency = " ".join(args)
     request_string = 'https://poe.ninja/api/data/CurrencyOverview?league={}&type=Currency&language=en'.format(current_league)
     r = requests.get(request_string)
-
+    simplified_user_request = requested_currency.replace("'", "").lower()
     for currency in r.json()['lines']:
         if currency['currencyTypeName'] == "Exalted Orb":
             exalt_value = currency['chaosEquivalent']
             break
 
-    currency_dict = {}  # dict format -- name: [correct name: exalt equivalent]
+    currency_dict = {}  # dict format -- {simplified name: [correct name: exalt equivalent]}
     for currency in r.json()['lines']:
-        simplified_name = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
-        currency_dict[simplified_name] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 2))]
-        currency_dict[currency['currencyTypeName']] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 2))]
+        simplified_currency = currency['currencyTypeName'].replace("'", "").lower()  # remove apostrophe and lowercase
+        currency_dict[simplified_currency] = [currency['currencyTypeName'], str(round(currency['chaosEquivalent'] / exalt_value, 2))]
     try:
-        return_statement = currency_dict[requested_currency][0] + '\'s' + " are worth " + "**" + currency_dict[requested_currency][1] + "**" + " exalted orbs."
+        return_statement = currency_dict[simplified_user_request][0] + '\'s' + " are worth " + "**" + currency_dict[simplified_user_request][1] + "**" + " exalted orbs."
         await ctx.send(return_statement)
     except:  # make less broad
         return_statement = "Cannot find: " + requested_currency + ". \n" + "Please make sure that you are typing the full name of the currency."
@@ -440,7 +440,7 @@ async def id(ctx, *args):
             break
 
     if is_item_found:
-        embedVar = discord.Embed(title="Item Search Result", description="uwu", color=0xff0000)
+        embedVar = discord.Embed(title="Item Search Result", description="uwu", color=0xff0000)  # todo: update color based on item type and extra fields based on type
         embedVar.set_thumbnail(url=found_item['icon'])
         embedVar.add_field(name="Name", value=found_item['name'], inline=False)
         embedVar.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
