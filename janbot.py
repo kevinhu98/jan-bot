@@ -444,9 +444,9 @@ async def id(ctx, *args):
         embedVar.set_thumbnail(url=found_item['icon'])
         embedVar.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
         for modifier in found_item['implicitModifiers']:
-            embedVar.add_field(name="Explicit: ", value=modifier)
-        for modifier in found_item['explicitModifiers']:
             embedVar.add_field(name="Implicit: ", value=modifier)
+        for modifier in found_item['explicitModifiers']:
+            embedVar.add_field(name="Explicit: ", value=modifier)
         await ctx.send(embed=embedVar)
 
     else:
