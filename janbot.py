@@ -423,9 +423,9 @@ async def add(ctx, *args):
 async def id(ctx):
 '''
 
-@bot.command(name="id")
+@bot.command(name="id")  #todo : div cards such as "A Dab of Ink are not found"
 async def id(ctx, *args):
-    requested_item = " ".join(arg.capitalize() for arg in args)
+    requested_item = " ".join(arg.capitalize() for arg in args)  #todo : all words should not be capitalized, or do a regex
     item_collections = poe_client.list_collection_names()
     item_collections.remove("currencies")
     item_collections.remove("users")
@@ -440,9 +440,8 @@ async def id(ctx, *args):
             break
 
     if is_item_found:
-        embedVar = discord.Embed(title="Item Search Result", description="uwu", color=0xff0000)  # todo: update color based on item type and extra fields based on type
+        embedVar = discord.Embed(title=found_item['name'], url=found_item['url'], description="uwu", color=0xff0000)  # todo: update color based on item type and extra fields based on type
         embedVar.set_thumbnail(url=found_item['icon'])
-        embedVar.add_field(name="Name", value=found_item['name'], inline=False)
         embedVar.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
         for modifier in found_item['implicitModifiers']:
             embedVar.add_field(name="Explicit: ", value=modifier)

@@ -9,7 +9,7 @@ current_league = "Ritual"
 item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
                     "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
 
-test_type_routes = ["UniqueJewel"]
+test_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask"]
 
 item_type_to_db = {"UniqueWeapon": "unique_weapons",
                    "DivinationCard": "divination_cards",
@@ -51,6 +51,13 @@ explicitModifiers
 aliases
 '''
 
+collection = poe_client["unique_weapons"]
+collection = poe_client["divination_cards"]
+collection = poe_client["unique_armours"]
+collection = poe_client["unique_accessories"]
+collection = poe_client["unique_jewels"]
+collection = poe_client["unique_flasks"]
+
 for item_type in test_type_routes:
     request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, item_type)
     r = requests.get(request_string)
@@ -68,7 +75,7 @@ for item_type in test_type_routes:
         item_to_add['aliases'] = []
         item_to_add['implicitModifiers'] = [item["implicitModifiers"][i]['text'] for i in range(len(item["implicitModifiers"]))]
         item_to_add['explicitModifiers'] = [item["explicitModifiers"][i]['text'] for i in range(len(item["explicitModifiers"]))]
-
+        item_to_add['url'] = "https://pathofexile.gamepedia.com/" + item['name'].replace(" ","_")
         print(item_to_add)
         specific_type_collection.insert_one(item_to_add)
 
