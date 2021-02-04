@@ -211,7 +211,7 @@ async def chaosEquivalent(ctx, *args):
         await ctx.send(return_statement)
 
 
-@bot.command(name="e")
+@bot.command(name="e", aliases=["ex"])
 async def exaltEquivalent(ctx, *args):
     """
     Displays the exalt equivalent of any items with "currency" tag
@@ -439,9 +439,14 @@ async def identify(ctx, *args):
     is_item_found = False
     for collection_name in item_collections:
         specific_type_collection = poe_client.get_collection(collection_name)
-        if specific_type_collection.find_one({"name": {"$regex": requested_item, "$options": 'i'}}):  # searches for item by name, case insensitive
+        if specific_type_collection.find_one({"name": {"$regex": requested_item, "$options": 'i'}}):  # search by name, case insensitive
             is_item_found = True
             found_item = specific_type_collection.find_one({"name": {"$regex": requested_item, "$options": 'i'}})  # todo: figure out how to not search twice
+            found_item = dict(found_item)
+            break
+        elif specific_type_collection.find_one({"aliases": requested_item.replace("'", "").lower()}):  # search by alias, removing all case and special characters
+            is_item_found = True
+            found_item = specific_type_collection.find_one({"aliases": requested_item.replace("'", "").lower()})  # todo: figure out how to not search twice
             found_item = dict(found_item)
             break
 

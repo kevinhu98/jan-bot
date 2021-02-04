@@ -52,6 +52,19 @@ aliases
 '''
 
 collection = poe_client["unique_weapons"]
+collection.drop()
+collection = poe_client["divination_cards"]
+collection.drop()
+collection = poe_client["unique_armours"]
+collection.drop()
+collection = poe_client["unique_accessories"]
+collection.drop()
+collection = poe_client["unique_jewels"]
+collection.drop()
+collection = poe_client["unique_flasks"]
+collection.drop()
+
+collection = poe_client["unique_weapons"]
 collection = poe_client["divination_cards"]
 collection = poe_client["unique_armours"]
 collection = poe_client["unique_accessories"]
@@ -72,7 +85,7 @@ for item_type in test_type_routes:
         item_to_add['itemType'] = item['itemType']
         item_to_add['icon'] = item["icon"]
         item_to_add['baseType'] = item["baseType"]
-        item_to_add['aliases'] = []
+        item_to_add['aliases'] = [item['name'].replace("'", "").lower()]
         item_to_add['implicitModifiers'] = [item["implicitModifiers"][i]['text'] for i in range(len(item["implicitModifiers"]))]
         item_to_add['explicitModifiers'] = [item["explicitModifiers"][i]['text'] for i in range(len(item["explicitModifiers"]))]
         item_to_add['url'] = "https://pathofexile.gamepedia.com/" + item['name'].replace(" ","_")
