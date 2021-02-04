@@ -5,7 +5,7 @@ import robin_stocks
 import requests
 from discord.ext import commands
 from dotenv import load_dotenv
-import praw
+#import praw
 import glob
 import random
 import sys
@@ -18,7 +18,7 @@ token = os.getenv('DISCORD_TOKEN')
 
 
 # setting up robinhood api info
-login = robin_stocks.login(os.getenv('ROBINHOOD_LOGIN'),os.getenv('ROBINHOOD_PW'))
+login = robin_stocks.login(os.getenv('ROBINHOOD_LOGIN'), os.getenv('ROBINHOOD_PW'))
 
 
 # setting up richard image paths
@@ -41,13 +41,14 @@ item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAcc
 
 currency_type_routes = ["Currency", "Fragment"]
 
+'''
 # setting up a read-only reddit instance
 reddit = praw.Reddit(
      client_id= os.getenv('REDDIT_CLIENT_ID'),
      client_secret= os.getenv('REDDIT_CLIENT_SECRET'),
      user_agent="my user agent"
 )
-
+'''
 # connect to db
 
 try:
@@ -61,7 +62,8 @@ except:
 
 bot = commands.Bot(command_prefix='', help_command=None)
 
-#to do: auto update current_league, update and move to different modules?
+# todo: auto update current_league, update and move to different modules?
+
 
 @bot.command(name="help")
 async def help(ctx):
@@ -80,6 +82,7 @@ async def help(ctx):
     embedVar.add_field(name="!positions", value="Displays account positions", inline=False)
     embedVar.add_field(name="!richard", value="Random richard picture", inline=False)
     await ctx.send(embed=embedVar)
+
 
 @bot.command(name="ci")
 async def item_chaos_price(ctx, *args):
@@ -127,6 +130,7 @@ async def item_chaos_price(ctx, *args):
 
     return_statement = "Cannot find: " + requested_item + ". \n" + "Please make sure that you are typing the full name of the item."
     await ctx.send(return_statement)
+
 
 @bot.command(name="ei")
 async def item_exalt_price(ctx, *args):
@@ -280,7 +284,7 @@ async def positions(ctx):  # portfolio
         positions += "".join((key + ", " + "Price: " + str(round(float(value["price"]), 2)) + "," + " Quantity: " + str(round(float(value["quantity"]))))) + "\n"
     await ctx.send(positions)
 
-
+'''
 @bot.command(name="!stonks")
 async def stonks(ctx):
     """
@@ -289,7 +293,7 @@ async def stonks(ctx):
     :return: Return string with amount in robinhood account
     """
     await ctx.send(robin_stocks.profiles.load_portfolio_profile(info="equity"))
-
+'''
 
 @bot.command(name="random")
 async def positions(ctx, *args):
@@ -396,6 +400,7 @@ async def death(ctx, arg):
     else:
         await ctx.send("woosh u missed")
 
+
 @bot.command(name="!register")
 async def register(ctx):
     requestor_id = ctx.message.author.id
@@ -423,9 +428,10 @@ async def add(ctx, *args):
 async def id(ctx):
 '''
 
-@bot.command(name="id")  #todo : div cards such as "A Dab of Ink are not found"
-async def id(ctx, *args):
-    requested_item = " ".join(arg.capitalize() for arg in args)  #todo : all words should not be capitalized, or do a regex
+
+@bot.command(name="id")
+async def identify(ctx, *args):
+    requested_item = " ".join(arg.capitalize() for arg in args)
     item_collections = poe_client.list_collection_names()
     item_collections.remove("currencies")
     item_collections.remove("users")
@@ -433,9 +439,9 @@ async def id(ctx, *args):
     is_item_found = False
     for collection_name in item_collections:
         specific_type_collection = poe_client.get_collection(collection_name)
-        if (specific_type_collection.find_one({"name": requested_item})):
+        if specific_type_collection.find_one({"name": {"$regex": requested_item, "$options": 'i'}}):  # searches for item by name, case insensitive
             is_item_found = True
-            found_item = specific_type_collection.find_one({"name": requested_item})
+            found_item = specific_type_collection.find_one({"name": {"$regex": requested_item, "$options": 'i'}})  # todo: figure out how to not search twice
             found_item = dict(found_item)
             break
 
