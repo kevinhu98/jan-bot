@@ -39,8 +39,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/janbot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="464">
-              <caret line="441" column="41" lean-forward="true" selection-start-line="441" selection-start-column="41" selection-end-line="441" selection-end-column="41" />
+            <state relative-caret-position="251">
+              <caret line="409" column="40" lean-forward="true" selection-start-line="409" selection-start-column="40" selection-end-line="409" selection-end-column="40" />
               <folding>
                 <element signature="e#9#18#0" expanded="true" />
               </folding>
@@ -51,7 +51,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/update_items_db.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="680">
+            <state relative-caret-position="476">
               <caret line="87" column="71" selection-start-line="87" selection-start-column="71" selection-end-line="87" selection-end-column="71" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
@@ -104,6 +104,9 @@
       <find>robin</find>
       <find>requested</find>
       <find>lower()</find>
+      <find>!richard</find>
+      <find>richard</find>
+      <find>random</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -371,12 +374,12 @@
       <workItem from="1612364102189" duration="38000" />
       <workItem from="1612410660344" duration="2055000" />
       <workItem from="1612412925144" duration="558000" />
-      <workItem from="1612475624514" duration="3655000" />
+      <workItem from="1612475624514" duration="13117000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="148120000" />
+    <option name="totallyTimeSpent" value="157582000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -421,7 +424,7 @@
     <SUITE FILE_PATH="coverage/currencyBot$testScraper.coverage" NAME="testScraper Coverage Results" MODIFIED="1570941204672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/jan_bot$testing.coverage" NAME="testing Coverage Results" MODIFIED="1611776296310" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/jan_bot$tmdbTest.coverage" NAME="tmdbTest Coverage Results" MODIFIED="1612135867732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="F:/PycharmProjects/tmdb" />
-    <SUITE FILE_PATH="coverage/jan_bot$janbot.coverage" NAME="janbot Coverage Results" MODIFIED="1612481362199" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/jan_bot$janbot.coverage" NAME="janbot Coverage Results" MODIFIED="1612493170492" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DiscordBot$discord.coverage" NAME="discord Coverage Results" MODIFIED="1570908798958" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/currencyBot$currencyBot.coverage" NAME="currencyBot Coverage Results" MODIFIED="1589837002563" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DiscordBot$PoeCurrencyBot.coverage" NAME="PoeCurrencyBot Coverage Results" MODIFIED="1570907970201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -481,7 +484,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/update_items_db.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
+        <state relative-caret-position="476">
           <caret line="87" column="71" selection-start-line="87" selection-start-column="71" selection-end-line="87" selection-end-column="71" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
@@ -491,8 +494,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/janbot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="464">
-          <caret line="441" column="41" lean-forward="true" selection-start-line="441" selection-start-column="41" selection-end-line="441" selection-end-column="41" />
+        <state relative-caret-position="251">
+          <caret line="409" column="40" lean-forward="true" selection-start-line="409" selection-start-column="40" selection-end-line="409" selection-end-column="40" />
           <folding>
             <element signature="e#9#18#0" expanded="true" />
           </folding>

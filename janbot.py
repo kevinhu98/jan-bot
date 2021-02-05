@@ -7,9 +7,13 @@ from discord.ext import commands
 from dotenv import load_dotenv
 #import praw
 import glob
-import random
 import sys
 import pymongo
+import operator
+import ast
+import re
+import random
+
 load_dotenv()
 
 
@@ -336,7 +340,7 @@ async def gunmo(ctx):
     await ctx.send(response)
 
 
-@bot.command(name="richard")
+@bot.command(name="!richard")
 async def randomRichard(ctx):
     await ctx.send(file=discord.File(random.choice(richardPics)))
 
@@ -401,7 +405,7 @@ async def death(ctx, arg):
         await ctx.send("woosh u missed")
 
 
-@bot.command(name="!register")
+@bot.command(name="!register")  # todo: add user custom item array, add/remove
 async def register(ctx):
     requestor_id = ctx.message.author.id
     if poe_users.find_one({"id": requestor_id}):
@@ -450,7 +454,7 @@ async def identify(ctx, *args):
             found_item = dict(found_item)
             break
 
-    if is_item_found:
+    if is_item_found:  # todo: create embed class/ embed function depending on item type
         embedVar = discord.Embed(title=found_item['name'], url=found_item['url'], description="uwu", color=0xff0000)  # todo: update color based on item type and extra fields based on type
         embedVar.set_thumbnail(url=found_item['icon'])
         embedVar.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
@@ -463,4 +467,43 @@ async def identify(ctx, *args):
     else:
         not_found_response = requested_item + " was not found. Please @ADKarry if you think this is an error."
         await ctx.send(not_found_response)
+
+# todo: move to separate module
+_OP_MAP = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.Invert: operator.neg,
+    ast.Pow: operator.pow,
+    ast.BitXor: operator.xor
+}
+
+
+class Calc(ast.NodeVisitor):
+
+    def visit_BinOp(self, node):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return _OP_MAP[type(node.op)](left, right)
+
+    def visit_Num(self, node):
+        return node.n
+
+    def visit_Expr(self, node):
+        return self.visit(node.value)
+
+    @classmethod
+    def evaluate(cls, expression):
+        tree = ast.parse(expression)
+        calc = cls()
+        return calc.visit(tree.body[0])
+
+@bot.command(name="calc")
+async def calc(ctx, arg):
+    try:
+        await ctx.send(Calc.evaluate(arg))
+    except Exception as err:
+        await ctx.send(err)
+
 bot.run(token)
