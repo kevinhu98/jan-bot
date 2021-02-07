@@ -13,7 +13,7 @@ import operator
 import ast
 import re
 import random
-
+from embed import createEmbed
 load_dotenv()
 
 
@@ -455,15 +455,8 @@ async def identify(ctx, *args):
             break
 
     if is_item_found:  # todo: create embed class/ embed function depending on item type
-        embedVar = discord.Embed(title=found_item['name'], url=found_item['url'], description="uwu", color=0xff0000)  # todo: update color based on item type and extra fields based on type
-        embedVar.set_thumbnail(url=found_item['icon'])
-        embedVar.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
-        for modifier in found_item['implicitModifiers']:
-            embedVar.add_field(name="Implicit: ", value=modifier)
-        for modifier in found_item['explicitModifiers']:
-            embedVar.add_field(name="Explicit: ", value=modifier)
-        await ctx.send(embed=embedVar)
-
+        e = createEmbed(found_item)
+        await ctx.send(embed=e)
     else:
         not_found_response = requested_item + " was not found. Please @ADKarry if you think this is an error."
         await ctx.send(not_found_response)
