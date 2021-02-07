@@ -13,7 +13,7 @@ import operator
 import ast
 import re
 import random
-from embed import createEmbed
+from embed import create_embed
 load_dotenv()
 
 
@@ -455,7 +455,7 @@ async def identify(ctx, *args):
             break
 
     if is_item_found:  # todo: create embed class/ embed function depending on item type
-        e = createEmbed(found_item)
+        e = create_embed(found_item)
         await ctx.send(embed=e)
     else:
         not_found_response = requested_item + " was not found. Please @ADKarry if you think this is an error."
