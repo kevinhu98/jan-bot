@@ -19,7 +19,6 @@ def create_embed(found_item):  # todo: figure out colors for embed based on item
         e.add_field(name="Explicit Modifiers:", value=explicit_modifiers, inline=False)
 
     elif item_category in ["DivinationCard"]:
-        # [Link text](http://example.com)
         reward = found_item['explicitModifiers'][0]
         reward_type_start = reward.find("<")
         reward_type_end = reward.find(">")
@@ -39,10 +38,12 @@ def create_embed(found_item):  # todo: figure out colors for embed based on item
         else:
             e.add_field(name="\u200b", value=reward[reward_item_start + 1: reward_item_end], inline=False)
 
-    elif item_category in ["UniqueJewel"]:
-        pass
-
     elif item_category in ["Prophecy"]:
+        e = discord.Embed(title=found_item['name'], url=found_item['url'], color=0x9F0FD5)
+        e.set_thumbnail(url=found_item["icon"])
+        e.add_field(name="\u200b", value=found_item["prophecyText"], inline=False)
+
+    elif item_category in ["UniqueJewel"]:
         pass
 
     #  adding in flavour text at end

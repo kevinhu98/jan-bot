@@ -9,7 +9,7 @@ current_league = "Ritual"
 item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
                     "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
 
-test_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask"]
+supported_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "Prophecy"]
 
 item_type_to_db = {"UniqueWeapon": "unique_weapons",
                    "DivinationCard": "divination_cards",
@@ -51,27 +51,13 @@ explicitModifiers
 aliases
 '''
 if input("Do you want to delete and recollect all item collections? y/n \n") == "y":
-    collection = poe_client["unique_weapons"]
-    collection.drop()
-    collection = poe_client["divination_cards"]
-    collection.drop()
-    collection = poe_client["unique_armours"]
-    collection.drop()
-    collection = poe_client["unique_accessories"]
-    collection.drop()
-    collection = poe_client["unique_jewels"]
-    collection.drop()
-    collection = poe_client["unique_flasks"]
-    collection.drop()
+    # delete and recreate collections
+    for item_type in supported_type_routes:
+        collection = poe_client[item_type_to_db[item_type]]
+        collection.drop()  # delete collection
+        collection = poe_client[item_type_to_db[item_type]]  # recreate collection
 
-    collection = poe_client["unique_weapons"]
-    collection = poe_client["divination_cards"]
-    collection = poe_client["unique_armours"]
-    collection = poe_client["unique_accessories"]
-    collection = poe_client["unique_jewels"]
-    collection = poe_client["unique_flasks"]
-
-    for item_type in test_type_routes:
+    for item_type in supported_type_routes:
         request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, item_type)
         r = requests.get(request_string)
         specific_type_collection = poe_client.get_collection(item_type_to_db[item_type])
@@ -93,6 +79,8 @@ if input("Do you want to delete and recollect all item collections? y/n \n") == 
             if item_type == "DivinationCard":
                 item_to_add['artUrl'] = "https://web.poecdn.com/image/divination-card/" + item['artFilename'] + ".png"
                 item_to_add['stackSize'] = item["stackSize"]
+            elif item_type == "Prophecy":
+                item_to_add['prophecyText'] = item["prophecyText"]
             print(item_to_add)
             specific_type_collection.insert_one(item_to_add)
 
