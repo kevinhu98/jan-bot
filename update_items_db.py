@@ -50,7 +50,7 @@ implicitModifiers
 explicitModifiers
 aliases
 '''
-if input("Do you want to delete and recollect all item collections? y/n") == "y":
+if input("Do you want to delete and recollect all item collections? y/n \n") == "y":
     collection = poe_client["unique_weapons"]
     collection.drop()
     collection = poe_client["divination_cards"]
@@ -90,6 +90,9 @@ if input("Do you want to delete and recollect all item collections? y/n") == "y"
             item_to_add['explicitModifiers'] = [item["explicitModifiers"][i]['text'] for i in range(len(item["explicitModifiers"]))]
             item_to_add['url'] = "https://pathofexile.gamepedia.com/" + item['name'].replace(" ","_")
             item_to_add['flavourText'] = item['flavourText']
+            if item_type == "DivinationCard":
+                item_to_add['artUrl'] = "https://web.poecdn.com/image/divination-card/" + item['artFilename'] + ".png"
+                item_to_add['stackSize'] = item["stackSize"]
             print(item_to_add)
             specific_type_collection.insert_one(item_to_add)
 
