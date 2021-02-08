@@ -4,8 +4,8 @@ import discord
 def create_embed(found_item):  # todo: figure out colors for embed based on item
     item_category = found_item["itemCategory"]
 
-    if item_category in ["UniqueWeapon", "UniqueArmour", "UniqueAccessory"]:
-        e = discord.Embed(title=found_item['name'], url=found_item['url'], description=found_item['itemBase'], color=0xff0000)
+    if item_category in ["UniqueWeapon", "UniqueAccessory"]:
+        e = discord.Embed(title=found_item['name'], url=found_item['url'], description=found_item['itemBase'], color=0xE37D30)
         e.set_thumbnail(url=found_item["icon"])
         e.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
         implicit_modifiers, explicit_modifiers = "", ""
@@ -16,6 +16,24 @@ def create_embed(found_item):  # todo: figure out colors for embed based on item
             explicit_modifiers += modifier + "\n"
 
         e.add_field(name="Implicit Modifiers:", value=implicit_modifiers, inline=False)
+        e.add_field(name="Explicit Modifiers:", value=explicit_modifiers, inline=False)
+
+    elif item_category in ["UniqueArmour"]:
+        e = discord.Embed(title=found_item['name'], url=found_item['url'], description=found_item['itemBase'],
+                          color=0xE37D30)
+        e.set_thumbnail(url=found_item["icon"])
+        e.add_field(name="Level Required: ", value=found_item['levelRequired'], inline=False)
+
+        if found_item['implicitModifiers']:
+            implicit_modifiers = ""
+            for i in range(len(found_item['implicitModifiers'])):
+                implicit_modifiers += found_item['implicitModifiers'][i] + "\n"
+            e.add_field(name="Implicit Modifiers:", value=implicit_modifiers, inline=False)
+
+        explicit_modifiers = ""
+        for i in range(len(found_item['explicitModifiers'])):
+            explicit_modifiers += found_item['explicitModifiers'][i] + "\n"
+
         e.add_field(name="Explicit Modifiers:", value=explicit_modifiers, inline=False)
 
     elif item_category in ["DivinationCard"]:
@@ -44,7 +62,13 @@ def create_embed(found_item):  # todo: figure out colors for embed based on item
         e.add_field(name="\u200b", value=found_item["prophecyText"], inline=False)
 
     elif item_category in ["UniqueJewel"]:
-        pass
+        e = discord.Embed(title=found_item['name'], url=found_item['url'], color=0xE37D30)
+        e.set_thumbnail(url=found_item["icon"])
+        explicit_modifiers = ""
+        for modifier in found_item['explicitModifiers']:
+            explicit_modifiers += modifier + "\n"
+
+        e.add_field(name="Explicit Modifiers:", value=explicit_modifiers, inline=False)
 
     #  adding in flavour text at end
     if "{" in found_item["flavourText"]:
