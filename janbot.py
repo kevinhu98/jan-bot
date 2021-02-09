@@ -436,17 +436,15 @@ async def id(ctx):
 '''
 
 
-@bot.command(name="id")
-async def identify(ctx, *args):
-    requested_item = " ".join(arg.capitalize() for arg in args)
+def find(requested_item) -> bool:
     item_collections = poe_client.list_collection_names()
     item_collections.remove("currencies")
     item_collections.remove("users")
+    exact_requested_item = "^" + requested_item + "$"  # regex for exact match
+    stripped_requested_item = requested_item.lower().replace("'", "")  # punctuation removed and lowercase
 
     for collection_name in item_collections:
         specific_type_collection = poe_client.get_collection(collection_name)
-        exact_requested_item = "^" + requested_item + "$"  # regex for exact match
-        stripped_requested_item = requested_item.lower().replace("'", "")  # punctuation removed and lowercase
 
         name_item_search = specific_type_collection.find_one({"name": {"$regex": exact_requested_item, "$options": 'i'}})  # search only by name
         stripped_search = specific_type_collection.find_one({"aliases": stripped_requested_item})
@@ -455,7 +453,15 @@ async def identify(ctx, *args):
             found_item = dict(name_item_search or stripped_search)  # todo: figure out how to not search twice
             break
 
-    if name_item_search or stripped_search:  # todo: create embed class/ embed function depending on item type
+    return found_item
+
+
+@bot.command(name="id")
+async def identify(ctx, *args):
+    requested_item = " ".join(arg.capitalize() for arg in args)
+    found_item = find(requested_item)
+
+    if found_item:  # todo: create embed class/ embed function depending on item type
         e = create_embed(found_item)
         await ctx.send(embed=e)
     else:
