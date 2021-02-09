@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 current_league = "Ritual"
-item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
-                    "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
+item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask",
+                    "UniqueMap", "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast",
+                    "Essence"]
 
-supported_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "Prophecy"]
+supported_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel",
+                         "UniqueFlask", "Prophecy"]
 
 item_type_to_db = {"UniqueWeapon": "unique_weapons",
                    "DivinationCard": "divination_cards",
@@ -28,7 +30,8 @@ item_type_to_db = {"UniqueWeapon": "unique_weapons",
                    "Beast": "beasts",
                    "Essence": "essences"}
 try:
-    client = pymongo.MongoClient("mongodb+srv://kevin:" + os.getenv('MONGO_PW') + "@cluster0.8xh0x.mongodb.net/poe.users?retryWrites=true&w=majority")
+    client = pymongo.MongoClient("mongodb+srv://kevin:" + os.getenv('MONGO_PW') +
+                                 "@cluster0.8xh0x.mongodb.net/poe.users?retryWrites=true&w=majority")
     poe_client = client.poe
     print('Successful connection')
 except:
@@ -74,7 +77,7 @@ if input("Do you want to delete and recollect all item collections? y/n \n") == 
             item_to_add['aliases'] = [item['name'].replace("'", "").lower()]
             item_to_add['implicitModifiers'] = [item["implicitModifiers"][i]['text'] for i in range(len(item["implicitModifiers"]))]
             item_to_add['explicitModifiers'] = [item["explicitModifiers"][i]['text'] for i in range(len(item["explicitModifiers"]))]
-            item_to_add['url'] = "https://pathofexile.gamepedia.com/" + item['name'].replace(" ","_")
+            item_to_add['url'] = "https://pathofexile.gamepedia.com/" + item['name'].replace(" ", "_")
             item_to_add['flavourText'] = item['flavourText']
             if item_type == "DivinationCard":
                 item_to_add['artUrl'] = "https://web.poecdn.com/image/divination-card/" + item['artFilename'] + ".png"

@@ -1,7 +1,7 @@
 import discord
 
 
-def create_embed(found_item):  # todo: figure out colors for embed based on item
+def create_embed(found_item):
     item_category = found_item["itemCategory"]
 
     if item_category in ["UniqueWeapon", "UniqueAccessory"]:

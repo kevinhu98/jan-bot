@@ -6,12 +6,14 @@ import requests
 from discord.ext import commands
 from dotenv import load_dotenv
 #import praw
+import itertools
 import glob
 import sys
 import pymongo
 import operator
 import ast
 import re
+
 import random
 from embed import create_embed
 load_dotenv()
@@ -82,6 +84,7 @@ async def help(ctx):
     embedVar.add_field(name="ce 'currency'", value="Returns the total exalted and chaos orb equivalent of currency", inline=False)
     embedVar.add_field(name="ci 'item' 'optional: 0l,5l,6l'", value="Returns the chaos orb equivalent of item", inline=False)
     embedVar.add_field(name="ei 'item'", value="Returns the exalted orb equivalent of item", inline=False)
+    embedVar.add_field(name="id 'item", value="Info about item (supports uniques, divination cards, and prophecies)", inline=False)
     embedVar.add_field(name="!stonks", value="Displays portfolio value", inline=False)
     embedVar.add_field(name="!positions", value="Displays account positions", inline=False)
     embedVar.add_field(name="!richard", value="Random richard picture", inline=False)
@@ -440,21 +443,19 @@ async def identify(ctx, *args):
     item_collections.remove("currencies")
     item_collections.remove("users")
 
-    is_item_found = False
     for collection_name in item_collections:
         specific_type_collection = poe_client.get_collection(collection_name)
-        if specific_type_collection.find_one({"name": {"$regex": requested_item, "$options": 'i'}}):  # search by name, case insensitive
-            is_item_found = True
-            found_item = specific_type_collection.find_one({"name": {"$regex": requested_item, "$options": 'i'}})  # todo: figure out how to not search twice
-            found_item = dict(found_item)
-            break
-        elif specific_type_collection.find_one({"aliases": requested_item.replace("'", "").lower()}):  # search by alias, removing all case and special characters
-            is_item_found = True
-            found_item = specific_type_collection.find_one({"aliases": requested_item.replace("'", "").lower()})  # todo: figure out how to not search twice
-            found_item = dict(found_item)
+        exact_requested_item = "^" + requested_item + "$"  # regex for exact match
+        stripped_requested_item = requested_item.lower().replace("'", "")  # punctuation removed and lowercase
+
+        name_item_search = specific_type_collection.find_one({"name": {"$regex": exact_requested_item, "$options": 'i'}})  # search only by name
+        stripped_search = specific_type_collection.find_one({"aliases": stripped_requested_item})
+
+        if name_item_search or stripped_search:  # search by name, case insensitive
+            found_item = dict(name_item_search or stripped_search)  # todo: figure out how to not search twice
             break
 
-    if is_item_found:  # todo: create embed class/ embed function depending on item type
+    if name_item_search or stripped_search:  # todo: create embed class/ embed function depending on item type
         e = create_embed(found_item)
         await ctx.send(embed=e)
     else:
@@ -492,7 +493,8 @@ class Calc(ast.NodeVisitor):
         calc = cls()
         return calc.visit(tree.body[0])
 
-@bot.command(name="calc")
+
+@bot.command(name="test", aliases=list(map(''.join, itertools.product(*((c.upper(), c.lower()) for c in 'Calc')))))
 async def calc(ctx, arg):
     try:
         await ctx.send(Calc.evaluate(arg))
