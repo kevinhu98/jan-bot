@@ -410,30 +410,16 @@ async def death(ctx, arg):
 
 @bot.command(name="!register")  # todo: add user custom item array, add/remove
 async def register(ctx):
-    requestor_id = ctx.message.author.id
-    if poe_users.find_one({"id": requestor_id}):
+    requester_id = ctx.message.author.id
+    if poe_users.find_one({"id": requester_id}):
         registered_string = ctx.message.author.name + " is already registered"
         await ctx.send(registered_string)
     else:
-        user_to_register = {"id": requestor_id, "items": []}
+        user_to_register = {"id": requester_id, "items": []}
         poe_users.insert_one(user_to_register)
         register_string = ctx.message.author.name + " is now registered"
         await ctx.send(register_string)
         print("user has been registered")
-
-'''
-# WIP
-@bot.command(name="!add")
-async def add(ctx, *args):
-    requestor_id = ctx.message.author.id
-    if not poe_users.find_one({"id": requestor_id}):
-        not_registered_string = "You are not currently registered. You can register using **!register**."
-        await ctx.send(not_registered_string)
-    else:
-
-@bot.command(name="id")
-async def id(ctx):
-'''
 
 
 def find(requested_item) -> bool:
@@ -451,9 +437,10 @@ def find(requested_item) -> bool:
 
         if name_item_search or stripped_search:  # search by name, case insensitive
             found_item = dict(name_item_search or stripped_search)  # todo: figure out how to not search twice
-            break
+            return found_item
 
-    return found_item
+    return None
+
 
 
 @bot.command(name="id")
@@ -500,11 +487,30 @@ class Calc(ast.NodeVisitor):
         return calc.visit(tree.body[0])
 
 
-@bot.command(name="test", aliases=list(map(''.join, itertools.product(*((c.upper(), c.lower()) for c in 'Calc')))))
+@bot.command(name="calc")
 async def calc(ctx, arg):
     try:
         await ctx.send(Calc.evaluate(arg))
     except Exception as err:
         await ctx.send(err)
 
+
+# WIP ---
+@bot.command(name="!add")
+async def add(ctx, *args):
+    requester_id = ctx.message.author.id  # discord id
+    requester = poe_users.find_one({"id": requester_id})  # single requester document
+    requested_item = " ".join(args).replace("'"," ").lower()
+    item_to_find = find(requested_item)
+
+    if requester:  # todo: check that item is not already in list
+        if item_to_find:
+            poe_users.find_one_and_update(
+                {"id": requester_id},
+                {"$push": {"items": item_to_find["name"]},
+            })
+            await ctx.send("item added")
+    else:
+        not_registered_string = "You are not currently registered. You can register using **!register**."
+        await ctx.send(not_registered_string)
 bot.run(token)
