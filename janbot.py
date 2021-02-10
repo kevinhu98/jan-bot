@@ -497,20 +497,35 @@ async def calc(ctx, arg):
 
 # WIP ---
 @bot.command(name="!add")
-async def add(ctx, *args):
+async def add(ctx, *args): # check registered, check item exists, check user has item already
     requester_id = ctx.message.author.id  # discord id
     requester = poe_users.find_one({"id": requester_id})  # single requester document
-    requested_item = " ".join(args).replace("'"," ").lower()
+    requested_item = " ".join(args).replace("'", " ").lower()
     item_to_find = find(requested_item)
 
-    if requester:  # todo: check that item is not already in list
-        if item_to_find:
-            poe_users.find_one_and_update(
-                {"id": requester_id},
-                {"$push": {"items": item_to_find["name"]},
-            })
-            await ctx.send("item added")
+    # todo: fix this cursed code block
+    if item_to_find:
+        check_duplicate = poe_users.find_one({"id": requester_id, "items": {"$in": [item_to_find["name"]]}})
     else:
-        not_registered_string = "You are not currently registered. You can register using **!register**."
-        await ctx.send(not_registered_string)
+        check_duplicate = False
+    if requester:  # todo: fixed nested structure
+        if item_to_find:
+            if not check_duplicate:
+                poe_users.find_one_and_update(
+                    {"id": requester_id},
+                    {"$push": {"items": item_to_find["name"]},
+                })
+                await ctx.send("item added")
+            else:
+                await ctx.send("This item already exists in your list.")
+        else:
+            await ctx.send("Item does not exist.")
+    else:
+        await ctx.send("You are not currently registered. You can register using **!register**.")
+
+'''
+@bot.command(name="!pricecheck")
+@bot.command(name="!remove")
+'''
+
 bot.run(token)
