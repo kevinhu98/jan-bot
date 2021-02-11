@@ -1,6 +1,7 @@
 # bot.py
 import os
 import discord
+from discord.ext import tasks
 import robin_stocks
 import requests
 from discord.ext import commands
@@ -14,6 +15,7 @@ import operator
 import ast
 import re
 import random
+import time
 from embed import create_embed
 from price_check import price_check
 load_dotenv()
@@ -501,4 +503,26 @@ async def pricecheck(ctx):
 async def remove(ctx, *args):
     pass
 
+global resting
+resting = True
+@bot.command(name="z")
+async def countdown(ctx):
+    resting = True
+    i = 90
+    while resting and i > 0:
+        if i >= 15: # and i % 15 == 0:
+            await ctx.send(i)
+        elif i < 15:
+            await ctx.send(i)
+        i -= 1
+        time.sleep(1)
+        print(resting)
+    await ctx.send("sadge")
+    resting = False
+
+@bot.command(name="cancel")
+async def cancel_resting(ctx):
+    resting = False
+    await ctx.send("cancled resting")
+    print(resting)
 bot.run(token)
