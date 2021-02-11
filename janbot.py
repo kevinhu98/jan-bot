@@ -13,9 +13,9 @@ import pymongo
 import operator
 import ast
 import re
-
 import random
 from embed import create_embed
+from price_check import price_check
 load_dotenv()
 
 
@@ -71,6 +71,10 @@ bot = commands.Bot(command_prefix='', help_command=None)
 # todo: auto update current_league, update and move to different modules?
 
 
+def strip(input_string):
+    return input_string.lower().replace("'", "")
+
+
 @bot.command(name="help")
 async def help(ctx):
     """
@@ -101,39 +105,7 @@ async def item_chaos_price(ctx, *args):
     """
     requested_item = " ".join(args)
 
-    for item_type in item_type_routes:
-        request_string = 'https://poe.ninja/api/data/itemoverview?league={}&type={}'.format(current_league, item_type)
-        r = requests.get(request_string)
-        if item_type in ["UniqueWeapon", "UniqueArmour"]:  # items that have different price per links
-            if requested_item[-2:] in ["0L", "0l", "5L", "5l", "6l", "6L"]:  # checking for specific linkage (0,5,6)
-                links = requested_item[-2:]  # last two chars are the num links
-                requested_item_name = requested_item[:-3]  # strip the num links and whitespace
-                for item in r.json()['lines']:
-                    if (item['name'].replace("'", "").lower() in [requested_item_name, requested_item_name.replace("'", "").lower()]) and str(item['links']) == str(requested_item[-2]):
-                        return_statement = "A " + str(item['links']) + " linked " + item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
-                        await ctx.send(return_statement)
-                        return
-            else:  # if no listed links, assume 0 links
-                for item in r.json()['lines']:
-                    if (item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'","").lower()]) and str(item['links']) == str(0):
-                        return_statement = "A " + str(item['links']) + " linked " + item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
-                        await ctx.send(return_statement)
-                        return
-        else:  # otherwise, links don't matter
-            for item in r.json()['lines']:
-                if item['name'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
-                    return_statement = item['name'] + ' is currently worth ' + str(item['chaosValue']) + " chaos orbs."
-                    await ctx.send(return_statement)
-                    return
-
-    for currency_type in currency_type_routes:
-        request_string = 'https://poe.ninja/api/data/currencyoverview?league={}&type={}'.format(current_league, currency_type)
-        r = requests.get(request_string)
-        for item in r.json()['lines']:
-            if item['currencyTypeName'].replace("'", "").lower() in [requested_item, requested_item.replace("'", "").lower()]:
-                return_statement = item['currencyTypeName'] + ' is currently worth ' + str(item['chaosEquivalent']) + " chaos orbs."
-                await ctx.send(return_statement)
-                return
+    await ctx.send(price_check(requested_item))
 
     return_statement = "Cannot find: " + requested_item + ". \n" + "Please make sure that you are typing the full name of the item."
     await ctx.send(return_statement)
@@ -419,7 +391,6 @@ async def register(ctx):
         poe_users.insert_one(user_to_register)
         register_string = ctx.message.author.name + " is now registered"
         await ctx.send(register_string)
-        print("user has been registered")
 
 
 def find(requested_item) -> bool:
@@ -447,7 +418,6 @@ def find(requested_item) -> bool:
 async def identify(ctx, *args):
     requested_item = " ".join(arg.capitalize() for arg in args)
     found_item = find(requested_item)
-
     if found_item:  # todo: create embed class/ embed function depending on item type
         e = create_embed(found_item)
         await ctx.send(embed=e)
@@ -497,35 +467,38 @@ async def calc(ctx, arg):
 
 # WIP ---
 @bot.command(name="!add")
-async def add(ctx, *args): # check registered, check item exists, check user has item already
+async def add(ctx, *args):  # check registered, check item exists, check user has item already
     requester_id = ctx.message.author.id  # discord id
     requester = poe_users.find_one({"id": requester_id})  # single requester document
-    requested_item = " ".join(args).replace("'", " ").lower()
-    item_to_find = find(requested_item)
-
+    requested_item = " ".join(args)
+    item_to_find = find(requested_item.capitalize())  # check item does exist and return item object
     # todo: fix this cursed code block
-    if item_to_find:
-        check_duplicate = poe_users.find_one({"id": requester_id, "items": {"$in": [item_to_find["name"]]}})
-    else:
-        check_duplicate = False
-    if requester:  # todo: fixed nested structure
-        if item_to_find:
-            if not check_duplicate:
-                poe_users.find_one_and_update(
-                    {"id": requester_id},
-                    {"$push": {"items": item_to_find["name"]},
-                })
-                await ctx.send("item added")
-            else:
-                await ctx.send("This item already exists in your list.")
-        else:
-            await ctx.send("Item does not exist.")
-    else:
+    # check if item already exists in user list
+    if not requester:
         await ctx.send("You are not currently registered. You can register using **!register**.")
+    elif not item_to_find:
+        await ctx.send("Item does not exist.")
+    elif poe_users.find_one({"id": requester_id, "items": {"$in": [item_to_find["name"]]}}):
+        await ctx.send("This item is already on your list.")
+    else:
+        poe_users.find_one_and_update(
+            {"id": requester_id},
+            {"$push": {"items": item_to_find["name"]},
+             })
+        return_string = item_to_find["name"] + " has now been added to your list."
+        await ctx.send(return_string)
 
-'''
-@bot.command(name="!pricecheck")
+
+@bot.command(name="!pricecheck") # todo: break price check code to separate function and call here
+async def pricecheck(ctx):
+    requester_id = ctx.message.author.id  # discord id
+    requester = poe_users.find_one({"id": requester_id})  # single requester document
+    requester_items = requester['items']
+    for item in requester_items:
+        await ctx.send(price_check(item))
+
 @bot.command(name="!remove")
-'''
+async def remove(ctx, *args):
+    pass
 
 bot.run(token)
