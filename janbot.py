@@ -101,14 +101,12 @@ bot = commands.Bot(command_prefix='', help_command=None)
 # todo: auto update current_league, update and move to different modules?
 
 
-
 def strip(input_string):
     return input_string.lower().replace("'", "")
 
 
 @bot.command(name="help")
-
-async def help(ctx):
+async def help_embed(ctx):
     """
     Displays a discord embed object with a list of commands
     :param ctx:
@@ -136,13 +134,13 @@ async def item_chaos_price(ctx, *args):
     :return: Returns string with chaos value
     """
     requested_item = ' '.join(args)
+    if price_check(requested_item):
+        await ctx.send(price_check(requested_item))
+        return
 
-
-
-    await ctx.send(price_check(requested_item))
-
-    return_statement = 'Cannot find: {item}. \nPlease make sure that you are typing the full name of the item.'.format(item=requested_item)
-    await ctx.send(return_statement)
+    else:
+        return_statement = 'Cannot find: {item}. \nPlease make sure that you are typing the full name of the item.'.format(item=requested_item)
+        await ctx.send(return_statement)
 
 
 @bot.command(name='ei')
