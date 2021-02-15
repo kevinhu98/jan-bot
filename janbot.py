@@ -1,34 +1,22 @@
 # bot.py
-import ast
-import glob
-#import praw
-import itertools
-import operator
 import os
-import random
-import re
-import sys
-
 import discord
-
-from discord.ext import tasks
 import robin_stocks
 import requests
 import robin_stocks
 from discord.ext import commands
 from dotenv import load_dotenv
-#import praw
 import itertools
 import glob
 import sys
 import pymongo
-import operator
-import ast
-import re
 import random
 import time
+
 from embed import create_embed
 from price_check import price_check
+from ext.utilities import *
+from cogs.poe_inventory import Inventory
 
 load_dotenv()
 
@@ -54,6 +42,7 @@ with open('text_file_resources/interviewquestions.txt') as f:
 
 
 # setting up poe ninja routes and league info
+# todo: auto update current_league
 current_league = 'Ritual'
 item_type_routes = [
     'UniqueWeapon',
@@ -77,33 +66,12 @@ item_type_routes = [
 
 currency_type_routes = ['Currency', 'Fragment']
 
-"""
-# setting up a read-only reddit instance
-reddit = praw.Reddit(
-     client_id= os.getenv('REDDIT_CLIENT_ID'),
-     client_secret= os.getenv('REDDIT_CLIENT_SECRET'),
-     user_agent="my user agent"
-)
-"""
+
 # connect to db
 
-try:
-    client = pymongo.MongoClient('mongodb+srv://kevin:{env}@cluster0.8xh0x.mongodb.net/poe.users?retryWrites=true&w=majority'.format(env=os.getenv('MONGO_PW')))
-    poe_client = client.poe
-    poe_users = poe_client.users
-    print('Successful connection')
-except:
-    print('no connection')
-
-
+poe_users = connectToDB().users
 bot = commands.Bot(command_prefix='', help_command=None)
-
-# todo: auto update current_league, update and move to different modules?
-
-
-def strip(input_string):
-    return input_string.lower().replace("'", "")
-
+bot.add_cog(Inventory(bot))
 
 @bot.command(name="help")
 async def help_embed(ctx):
@@ -294,17 +262,6 @@ async def positions(ctx):  # portfolio
         positions += ''.join(('{key}, Price: {price}, Quantity: {quantity}\n'.format(key=key, price=str(round(float(value['price']), 2)), quantity=str(round(float(value['quantity']))))))
     await ctx.send(positions)
 
-'''
-@bot.command(name="!stonks")
-async def stonks(ctx):
-    """
-    Displays current account portfolio
-    :param ctx:
-    :return: Return string with amount in robinhood account
-    """
-    await ctx.send(robin_stocks.profiles.load_portfolio_profile(info="equity"))
-'''
-
 
 @bot.command(name='random')
 async def positions(ctx, *args):
@@ -377,25 +334,6 @@ async def interviewquestion(ctx):
     await ctx.send(random.choice(interviewQuestions))
 
 
-"""
-@bot.command(name="wsb")
-# apparently this already exists
-async def positions(ctx):
-    post_number = 1
-    limit = 20
-    await ctx.send("Here are the top {} hot posts on wsb:".format(limit))
-    for submission in reddit.subreddit("wallstreetbets").hot(limit=limit):
-        post_number_return_string = "The current post number: " + str(post_number_return_string)
-        await ctx.send()
-        for top_level_comment in submission.comments:
-            try:
-                return_statement = top_level_comment.body + str(top_level_comment.score)
-                await ctx.send(return_statement)
-            except discord.errors.HTTPException:  # body length too long
-                await ctx.send("2000 length")
-"""
-
-
 @bot.command(name='commit')
 async def death(ctx, arg):
     """
@@ -424,26 +362,6 @@ async def register(ctx):
         register_string = '{name} is now registered'.format(name=ctx.message.author.name)
         await ctx.send(register_string)
 
-def find(requested_item) -> bool:
-    item_collections = poe_client.list_collection_names()
-    item_collections.remove('currencies')
-    item_collections.remove('users')
-    exact_requested_item = '^{item}$'.format(item=requested_item)  # regex for exact match
-    stripped_requested_item = requested_item.lower().replace("'", '')  # punctuation removed and lowercase
-
-    for collection_name in item_collections:
-        specific_type_collection = poe_client.get_collection(collection_name)
-
-        name_item_search = specific_type_collection.find_one({'name': {'$regex': exact_requested_item, '$options': 'i'}})  # search only by name
-        stripped_search = specific_type_collection.find_one({'aliases': stripped_requested_item})
-
-        if name_item_search or stripped_search:  # search by name, case insensitive
-            found_item = dict(name_item_search or stripped_search)  # todo: figure out how to not search twice
-            return found_item
-
-    return None
-
-
 
 @bot.command(name='id')
 async def identify(ctx, *args):
@@ -456,36 +374,6 @@ async def identify(ctx, *args):
         not_found_response = '{item} was not found. Please @ADKarry if you think this is an error.'.format(item=requested_item)
         await ctx.send(not_found_response)
 
-# todo: move to separate module
-_OP_MAP = {
-    ast.Add: operator.add,
-    ast.Sub: operator.sub,
-    ast.Mult: operator.mul,
-    ast.Div: operator.truediv,
-    ast.Invert: operator.neg,
-    ast.Pow: operator.pow,
-    ast.BitXor: operator.xor,
-}
-
-
-class Calc(ast.NodeVisitor):
-
-    def visit_BinOp(self, node):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
-        return _OP_MAP[type(node.op)](left, right)
-
-    def visit_Num(self, node):
-        return node.n
-
-    def visit_Expr(self, node):
-        return self.visit(node.value)
-
-    @classmethod
-    def evaluate(cls, expression):
-        tree = ast.parse(expression)
-        calc = cls()
-        return calc.visit(tree.body[0])
 
 
 @bot.command(name='calc')
@@ -496,52 +384,12 @@ async def calc(ctx, arg):
         await ctx.send(err)
 
 
-# WIP ---
-
-@bot.command(name="!add")
-async def add(ctx, *args):  # check registered, check item exists, check user has item already
-    requester_id = ctx.message.author.id  # discord id
-    requester = poe_users.find_one({"id": requester_id})  # single requester document
-    requested_item = " ".join(args)
-    item_to_find = find(requested_item.capitalize())  # check item does exist and return item object
-    # todo: fix this cursed code block
-    # check if item already exists in user list
-    if not requester:
-        await ctx.send("You are not currently registered. You can register using **!register**.")
-    elif not item_to_find:
-        await ctx.send("Item does not exist.")
-    elif poe_users.find_one({"id": requester_id, "items": {"$in": [item_to_find["name"]]}}):
-        await ctx.send("This item is already on your list.")
-    else:
-        poe_users.find_one_and_update(
-            {"id": requester_id},
-            {"$push": {"items": item_to_find["name"]},
-             })
-        return_string = item_to_find["name"] + " has now been added to your list."
-        await ctx.send(return_string)
-
-
-
-@bot.command(name="!pricecheck") # todo: break price check code to separate function and call here
-async def pricecheck(ctx):
-    requester_id = ctx.message.author.id  # discord id
-    requester = poe_users.find_one({"id": requester_id})  # single requester document
-    requester_items = requester['items']
-    for item in requester_items:
-        await ctx.send(price_check(item))
-
-@bot.command(name="!remove")
-async def remove(ctx, *args):
-    pass
-
-global resting
-resting = True
 @bot.command(name="z")
 async def countdown(ctx):
     resting = True
     i = 90
     while resting and i > 0:
-        if i >= 15: # and i % 15 == 0:
+        if i >= 15 and i % 15 == 0:
             await ctx.send(i)
         elif i < 15:
             await ctx.send(i)
@@ -549,11 +397,5 @@ async def countdown(ctx):
         time.sleep(1)
         print(resting)
     await ctx.send("sadge")
-    resting = False
 
-@bot.command(name="cancel")
-async def cancel_resting(ctx):
-    resting = False
-    await ctx.send("cancled resting")
-    print(resting)
 bot.run(token)

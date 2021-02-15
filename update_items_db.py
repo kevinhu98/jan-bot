@@ -1,5 +1,4 @@
 import os
-
 import pymongo
 import requests
 from dotenv import load_dotenv
@@ -62,22 +61,6 @@ try:
 except:
     print('no connection')
 
-# div card art path different, i.e. https://web.poecdn.com/image/divination-card/ADabOfInk.png
-"""
-item:
-
-poeninjaID
-name
-item_type_route
-baseType
-levelRequired
-itemType
-flavourText
-icon
-implicitModifiers
-explicitModifiers
-aliases
-"""
 if input('Do you want to delete and recollect all item collections? y/n \n') == 'y':
     # delete and recreate collections
     for item_type in supported_type_routes:

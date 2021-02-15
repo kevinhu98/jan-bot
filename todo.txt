@@ -1,0 +1,4 @@
+update all return_string lines with .format
+check registration for inventory cog methods
+move functions to emote and misc cogs
+

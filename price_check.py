@@ -1,5 +1,4 @@
 import requests
-import discord
 
 current_league = "Ritual"
 item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
