@@ -73,7 +73,8 @@ poe_users = connectToDB().users
 bot = commands.Bot(command_prefix='', help_command=None)
 bot.add_cog(Inventory(bot))
 
-@bot.command(name="help")
+
+@bot.command(name="help")  # todo: make help embed multi-page
 async def help_embed(ctx):
     """
     Displays a discord embed object with a list of commands
@@ -274,8 +275,7 @@ async def positions(ctx, *args):
 
 @bot.command(name='hello', aliases=['Hello', 'Hi', 'hi'])
 async def hello(ctx):
-    return_string = 'Hello, {name}'.format(name=ctx.message.author.name)
-    await ctx.send(return_string)
+    await ctx.send('Hello, {name}'.format(name=ctx.message.author.name))
 
 
 @bot.command(name='choke')
@@ -349,20 +349,6 @@ async def death(ctx, arg):
     else:
         await ctx.send('woosh u missed')
 
-
-@bot.command(name='!register')  # todo: add user custom item array, add/remove
-async def register(ctx):
-    requester_id = ctx.message.author.id
-    if poe_users.find_one({'id': requester_id}):
-        registered_string = '{name} is already registered'.format(name=ctx.message.author.name)
-        await ctx.send(registered_string)
-    else:
-        user_to_register = {'id': requester_id, 'items': []}
-        poe_users.insert_one(user_to_register)
-        register_string = '{name} is now registered'.format(name=ctx.message.author.name)
-        await ctx.send(register_string)
-
-
 @bot.command(name='id')
 async def identify(ctx, *args):
     requested_item = ' '.join(arg.capitalize() for arg in args)
@@ -385,7 +371,7 @@ async def calc(ctx, arg):
 
 
 @bot.command(name="z")
-async def countdown(ctx):
+async def countdown_90(ctx):
     resting = True
     i = 90
     while resting and i > 0:
@@ -398,4 +384,20 @@ async def countdown(ctx):
         print(resting)
     await ctx.send("sadge")
 
+@bot.command(name="x")
+async def countdown_60(ctx):
+    resting = True
+    i = 60
+    while resting and i > 0:
+        if i >= 15 and i % 15 == 0:
+            await ctx.send(i)
+        elif i < 15:
+            await ctx.send(i)
+        i -= 1
+        time.sleep(1)
+        print(resting)
+    await ctx.send("sadge")
+
+
+print("janbot running...")
 bot.run(token)
