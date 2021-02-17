@@ -6,18 +6,16 @@ import requests
 import robin_stocks
 from discord.ext import commands
 from dotenv import load_dotenv
-import itertools
 import glob
 import sys
-import pymongo
 import random
 import time
 
-from embed import create_embed
+from embed import create_poe_item_embed
 from price_check import price_check
 from ext.utilities import *
 from cogs.poe_inventory import Inventory
-
+from cogs.stocks import Stocks
 load_dotenv()
 
 
@@ -72,7 +70,7 @@ currency_type_routes = ['Currency', 'Fragment']
 poe_users = connectToDB().users
 bot = commands.Bot(command_prefix='', help_command=None)
 bot.add_cog(Inventory(bot))
-
+bot.add_cog(Stocks(bot))
 
 @bot.command(name="help")  # todo: make help embed multi-page
 async def help_embed(ctx):
@@ -349,17 +347,17 @@ async def death(ctx, arg):
     else:
         await ctx.send('woosh u missed')
 
+
 @bot.command(name='id')
 async def identify(ctx, *args):
     requested_item = ' '.join(arg.capitalize() for arg in args)
     found_item = find(requested_item)
     if found_item:  # todo: create embed class/ embed function depending on item type
-        e = create_embed(found_item)
+        e = create_poe_item_embed(found_item)
         await ctx.send(embed=e)
     else:
         not_found_response = '{item} was not found. Please @ADKarry if you think this is an error.'.format(item=requested_item)
         await ctx.send(not_found_response)
-
 
 
 @bot.command(name='calc')
@@ -383,6 +381,7 @@ async def countdown_90(ctx):
         time.sleep(1)
         print(resting)
     await ctx.send("sadge")
+
 
 @bot.command(name="x")
 async def countdown_60(ctx):

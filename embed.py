@@ -1,7 +1,7 @@
 import discord
 
 
-def create_embed(found_item):
+def create_poe_item_embed(found_item):
     item_category = found_item['itemCategory']
 
     if item_category in ['UniqueWeapon', 'UniqueAccessory']:
@@ -110,3 +110,7 @@ def create_embed(found_item):
         )
 
     return e
+
+
+def create_dd_embed():
+    pass
