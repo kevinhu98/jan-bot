@@ -4,7 +4,7 @@ import os
 import discord
 
 
-def add_embed_field(submission, embed):
+def add_embed_field(submission, embed) -> None:
     embed_value_name = "{score}- {title}".format(score=submission.score, title=submission.title)
     embed_value_link = submission.url
     embed.add_field(name='\u200b',

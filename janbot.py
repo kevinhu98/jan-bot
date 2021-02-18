@@ -1,7 +1,6 @@
 # bot.py
 import os
 import discord
-import robin_stocks
 import requests
 import robin_stocks
 from discord.ext import commands
@@ -11,7 +10,7 @@ import sys
 import random
 import time
 
-from embed import create_poe_item_embed
+from cogs.embed import create_poe_item_embed
 from price_check import price_check
 from ext.utilities import *
 from cogs.poe_inventory import Inventory
@@ -22,10 +21,10 @@ load_dotenv()
 # setting up discord api info
 token = os.getenv('DISCORD_TOKEN')
 
-
+'''
 # setting up robinhood api info
 login = robin_stocks.login(os.getenv('ROBINHOOD_LOGIN'), os.getenv('ROBINHOOD_PW'))
-
+'''
 
 # setting up richard image paths
 richardPicDir = glob.glob('richardpics/*')
@@ -379,7 +378,6 @@ async def countdown_90(ctx):
             await ctx.send(i)
         i -= 1
         time.sleep(1)
-        print(resting)
     await ctx.send("sadge")
 
 
@@ -394,9 +392,7 @@ async def countdown_60(ctx):
             await ctx.send(i)
         i -= 1
         time.sleep(1)
-        print(resting)
     await ctx.send("sadge")
-
 
 print("janbot running...")
 bot.run(token)
