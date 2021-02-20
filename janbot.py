@@ -1,6 +1,7 @@
 # bot.py
 import os
 import discord
+import robin_stocks
 import requests
 import robin_stocks
 from discord.ext import commands
@@ -9,12 +10,14 @@ import glob
 import sys
 import random
 import time
+import asyncio
 
-from cogs.embed import create_poe_item_embed
+from embed import create_poe_item_embed
 from price_check import price_check
 from ext.utilities import *
 from cogs.poe_inventory import Inventory
 from cogs.stocks import Stocks
+from cogs.music import Music
 load_dotenv()
 
 
@@ -70,6 +73,7 @@ poe_users = connectToDB().users
 bot = commands.Bot(command_prefix='', help_command=None)
 bot.add_cog(Inventory(bot))
 bot.add_cog(Stocks(bot))
+bot.add_cog(Music(bot))
 
 @bot.command(name="help")  # todo: make help embed multi-page
 async def help_embed(ctx):

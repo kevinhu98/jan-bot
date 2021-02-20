@@ -24,8 +24,8 @@ class Stocks(commands.Cog):
         )
 
     @commands.command(name="dd")
-    async def grab_dd(self, ctx, count=50):
-        if count == 50:
+    async def grab_dd(self, ctx, count=100):
+        if count == 100:
             await ctx.send("Grabbing DD...")
         elif count > 500:
             await ctx.send("Don't break janbot pls")
@@ -40,13 +40,13 @@ class Stocks(commands.Cog):
             for submission in self.reddit.subreddit(subreddit).hot(limit=count):
                 if submission.score > 100 and submission.link_flair_text in ["DD", "DD :DD:"]:
                     add_embed_field(submission, e)
-                elif submission.score > 50 and "dd" in submission.title.lower().split() and subreddit in ['options']:  # grabbing from r/options, since no flairs
+                elif submission.score > 5 and "dd" in submission.title.lower().split() and subreddit in ['options']:  # grabbing from r/options, since no flairs
                     add_embed_field(submission, e)
             await ctx.send(embed=e)
 
     @commands.command(name="ddnew")
-    async def grab_dd_new(self, ctx, count=50):
-        if count == 50:
+    async def grab_dd_new(self, ctx, count=100):
+        if count == 100:
             await ctx.send("Grabbing DD...")
         elif count > 500:
             await ctx.send("Don't break janbot pls")
