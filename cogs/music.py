@@ -1,5 +1,5 @@
 import asyncio
-
+import discord
 import discord
 import youtube_dl
 
@@ -72,15 +72,28 @@ class Music(commands.Cog):
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
             ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+        playing_message = await ctx.send('Now playing: {}'.format(player.title))
+        await playing_message.add_reaction('❌')
 
-        await ctx.send('Now playing: {}'.format(player.title))
+        def check(reaction, user):
+            return user == ctx.message.author and str(reaction.emoji) == '❌'
+
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=600, check=check)
+            if reaction.emoji == '❌':
+                await ctx.voice_client.disconnect()
+                await playing_message.delete()
+
+        except asyncio.TimeoutError:
+            await ctx.send("Timed out")
 
     @commands.command()
     async def volume(self, ctx, volume: int):
         """Changes the player's volume"""
-
+        if volume < 0:
+            return await ctx.send("Volume cannot be lower than zero")
         if ctx.voice_client is None:
-            return await ctx.send("Not connected to a voice channel.")
+            return await ctx.send("janbot is not connected to a voice channel.")
 
         ctx.voice_client.source.volume = volume / 100
         await ctx.send("Changed volume to {}%".format(volume))

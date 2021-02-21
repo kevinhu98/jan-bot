@@ -28,8 +28,7 @@ class Stocks(commands.Cog):
         if count == 100:
             await ctx.send("Grabbing DD...")
         elif count > 500:
-            await ctx.send("Don't break janbot pls")
-            return
+            return await ctx.send("Don't break janbot pls")
         else:
             await ctx.send("Grabbing DD from latest {count} posts".format(count=count))
         for subreddit in self.subreddits:
@@ -49,8 +48,7 @@ class Stocks(commands.Cog):
         if count == 100:
             await ctx.send("Grabbing DD...")
         elif count > 500:
-            await ctx.send("Don't break janbot pls")
-            return
+            return await ctx.send("Don't break janbot pls")
         else:
             await ctx.send("Grabbing DD from latest {count} posts".format(count=count))
         for subreddit in self.subreddits:

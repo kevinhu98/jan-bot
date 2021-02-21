@@ -105,8 +105,7 @@ async def item_chaos_price(ctx, *args):
     """
     requested_item = ' '.join(args)
     if price_check(requested_item):
-        await ctx.send(price_check(requested_item))
-        return
+        return await ctx.send(price_check(requested_item))
 
     else:
         return_statement = 'Cannot find: {item}. \nPlease make sure that you are typing the full name of the item.'.format(item=requested_item)
@@ -132,20 +131,20 @@ async def item_exalt_price(ctx, *args):
                 for item in r.json()['lines']:
                     if (item['name'].replace("'", '').lower() in [requested_item_name, requested_item_name.replace("'", '').lower()]) and str(item['links']) == str(requested_item[-2]):
                         return_statement = 'A {arg1} linked {arg2} is currently worth {arg3} exalted orbs.'.format(arg1=str(item['links']), arg2=item['name'], arg3=str(item['exaltedValue']))
-                        await ctx.send(return_statement)
-                        return
+                        return await ctx.send(return_statement)
+
             else:  # if no listed links, assume 0 links
                 for item in r.json()['lines']:
                     if (item['name'].replace("'", '').lower() in [requested_item, requested_item.replace("'", '').lower()]) and str(item['links']) == str(0):
                         return_statement = 'A {arg1} linked {arg2} is currently worth {arg3} exalted orbs.'.format(arg1=str(item['links']), arg2=item['name'], arg3=str(item['exaltedValue']))
-                        await ctx.send(return_statement)
-                        return
+                        return await ctx.send(return_statement)
+
         else:  # otherwise, links don't matter
             for item in r.json()['lines']:
                 if item['name'].replace("'", '').lower() in [requested_item, requested_item.replace("'", '').lower()]:
                     return_statement = '{item} is currently worth {price} exalted orbs.'.format(item=item['name'], price=str(item['exaltedValue']))
-                    await ctx.send(return_statement)
-                    return
+                    return await ctx.send(return_statement)
+
 
     return_statement = 'Cannot find: {item}. \nPlease make sure that you are typing the full name of the item.'.format(item=requested_item)
     await ctx.send(return_statement)
@@ -359,8 +358,7 @@ async def identify(ctx, *args):
         e = create_poe_item_embed(found_item)
         await ctx.send(embed=e)
     else:
-        not_found_response = '{item} was not found. Please @ADKarry if you think this is an error.'.format(item=requested_item)
-        await ctx.send(not_found_response)
+        await ctx.send('{item} was not found. Please @ADKarry if you think this is an error.'.format(item=requested_item))
 
 
 @bot.command(name='calc')
