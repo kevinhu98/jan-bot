@@ -15,6 +15,7 @@ import asyncio
 from embed import create_poe_item_embed
 from price_check import price_check
 from ext.utilities import *
+from cogs.bet import Bet
 from cogs.poe_inventory import Inventory
 from cogs.stocks import Stocks
 from cogs.music import Music
@@ -69,11 +70,12 @@ currency_type_routes = ['Currency', 'Fragment']
 
 # connect to db
 
-poe_users = connectToDB().users
+poe_users = connectToPoeDB().users
 bot = commands.Bot(command_prefix='', help_command=None)
 bot.add_cog(Inventory(bot))
 bot.add_cog(Stocks(bot))
 bot.add_cog(Music(bot))
+bot.add_cog(Bet(bot))
 
 @bot.command(name="help")  # todo: make help embed multi-page
 async def help_embed(ctx):

@@ -1,8 +1,9 @@
-from ext.setup import connectToDB
+from ext.setup import connectToPoeDB
+
 import ast
 import operator
 
-poe_client = connectToDB()
+poe_client = connectToPoeDB()
 
 _OP_MAP = {
     ast.Add: operator.add,

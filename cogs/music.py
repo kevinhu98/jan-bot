@@ -55,7 +55,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         """Joins a voice channel"""
@@ -74,18 +73,18 @@ class Music(commands.Cog):
             ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
         playing_message = await ctx.send('Now playing: {}'.format(player.title))
         await playing_message.add_reaction('❌')
-
         def check(reaction, user):
             return user == ctx.message.author and str(reaction.emoji) == '❌'
 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=600, check=check)
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=1000, check=check)
             if reaction.emoji == '❌':
                 await ctx.voice_client.disconnect()
                 await playing_message.delete()
 
         except asyncio.TimeoutError:
-            await ctx.send("Timed out")
+            await playing_message.remove_reaction('❌', self.bot.user)
+            return
 
     @commands.command()
     async def volume(self, ctx, volume: int):
@@ -114,3 +113,5 @@ class Music(commands.Cog):
                 raise commands.CommandError("Author not connected to a voice channel.")
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
+
+

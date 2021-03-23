@@ -1,12 +1,12 @@
 from discord.ext import commands
 from ext.utilities import *
 from price_check import *
-
+from ext.setup import *
 
 class Inventory(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.users = connectToDB().users
+        self.users = connectToPoeDB().users
 
     def find_user(self, discord_id):
         return self.users.find_one({"id": discord_id})

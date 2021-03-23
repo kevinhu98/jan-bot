@@ -62,3 +62,4 @@ class Stocks(commands.Cog):
                 elif submission.score > 30 and "dd" in submission.title.lower().split() and subreddit in ['options']:  # grabbing from r/options, since no flairs
                     add_embed_field(submission, e)
             await ctx.send(embed=e)
+
