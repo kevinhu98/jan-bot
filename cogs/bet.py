@@ -6,6 +6,26 @@ class Bet(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bets = connectToBetDB().bet
+        self.betters = connectToBetDB().betters
+
+    @commands.command(name='$register')
+    async def createBetter(self, ctx):
+        requester_id = ctx.message.author.id
+        requester_username = ctx.message.author.name
+        if self.betters.find_one({'id': requester_id}):
+            await ctx.send('{name} is already registered'.format(name=ctx.message.author.name))
+        else:
+            user_object = {'id': requester_id,
+                           'aliases': [requester_username],
+                           'pushups_owed': 0,
+                           'pushups_lifetime': 0,
+                           'money_owed': 0,
+                           'money_lifetime': 0,
+                           'bets_won': 0,
+                           'bets_lost': 0
+                        }
+            self.betters.insert_one(user_object)
+            await ctx.send('{name} is now registered'.format(name=ctx.message.author.name))
 
     @commands.command(name='$bethelp')
     async def displayBetHelp(self, ctx):
@@ -27,9 +47,9 @@ class Bet(commands.Cog):
 
         bet_to_create = {'created_by': requester_id,
                          'betting_against': betParams[0],
-                         'team_1': betParams[1],
-                         'team_2': betParams[2],
-                         'created_by_prediction': betParams[3],
+                         'team_1': betParams[1].upper(),
+                         'team_2': betParams[2].upper(),
+                         'created_by_prediction': betParams[3].upper(),
                          'odds': betParams[4],
                          'amount': betParams[5],
                          'betting_against_amount': betting_against_amount,  # amount other person is betting
@@ -57,4 +77,35 @@ class Bet(commands.Cog):
         })
         for doc in cur:
             await ctx.send(doc)
-       # await ctx.send()
+
+    @commands.command(name='$winner')
+    async def setWinner(self, ctx, *args):
+        requester_id = ctx.message.author.id
+        requester_username = ctx.message.author.name
+        winnerParams = ''.join(args).split(",")
+        team_1 = winnerParams[0].upper()
+        team_2 = winnerParams[1].upper()
+        winner = winnerParams[2].upper()
+
+        # looking for bet that does not have a winner yet
+        found_bet = self.bets.find_one({
+            '$and': [{"team_1": team_1},
+                     {"team_2": team_2},
+                     {"winner": None}
+                     ]
+        }) or self.bets.find_one({
+            '$and': [{"team_1": team_2},
+                     {"team_2": team_1},
+                     {"winner": None}
+                     ]
+        })
+
+        if found_bet:
+            self.bets.find_one_and_update(
+                {"_id": ObjectId(found_bet['_id'])},
+                {"$set": {"winner": winner}}
+            )
+            #todo: grab the two user id's from the bet and update pushups, wins, losses
+        else:
+            await ctx.send("bet was not found")
+
