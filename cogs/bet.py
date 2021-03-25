@@ -51,7 +51,7 @@ class Bet(commands.Cog):
                          'team_2': betParams[2].upper(),
                          'created_by_prediction': betParams[3].upper(),
                          'odds': betParams[4],
-                         'amount': betParams[5],
+                         'amount': int(betParams[5]),
                          'betting_against_amount': betting_against_amount,  # amount other person is betting
                          'accepted': False,
                          'winner': None
@@ -105,7 +105,37 @@ class Bet(commands.Cog):
                 {"_id": ObjectId(found_bet['_id'])},
                 {"$set": {"winner": winner}}
             )
-            #todo: grab the two user id's from the bet and update pushups, wins, losses
+
+            # updating bet people stats, should prob move to separate function
+            if winner == found_bet['created_by_prediction']:  # person who made bet was correct
+                self.betters.find_one_and_update(
+                    {"id": found_bet['created_by']},
+                    {"$inc": {'bets_won': 1}}
+                )
+                self.betters.find_one_and_update(
+                    {"aliases": {"$in": [found_bet['betting_against']]}},
+                    {"$inc": {
+                        'bets_lost': 1,
+                        'pushups_owed': found_bet['betting_against_amount'],
+                        'pushups_lifetime': found_bet['betting_against_amount']
+                    }}
+                )
+
+            else:  # bet creator was incorrect
+                self.betters.find_one_and_update(
+                    {"id": found_bet['created_by']},
+                    {"$inc": {
+                        'bets_lost': 1,
+                        'pushups_owed': found_bet['amount'],
+                        'pushups_lifetime': found_bet['amount']
+                    }}
+                )
+                self.betters.find_one_and_update(
+                    {"aliases": {"$in": [found_bet['betting_against']]}},
+                    {"$inc": {'bets_won': 1}}
+                )
+            await ctx.send("done")
+
         else:
             await ctx.send("bet was not found")
 

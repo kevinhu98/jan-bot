@@ -60,7 +60,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/janbot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="-1105">
               <caret line="60" column="16" lean-forward="true" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="16" />
               <folding>
                 <element signature="e#9#18#0" expanded="true" />
@@ -82,18 +82,9 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/embed.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="22" column="53" selection-start-line="22" selection-start-column="53" selection-end-line="22" selection-end-column="53" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cogs/poe_inventory.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="362">
+            <state relative-caret-position="107">
               <caret line="38" column="31" selection-start-line="38" selection-start-column="23" selection-end-line="38" selection-end-column="31" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
@@ -102,11 +93,20 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/embed.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="374">
+              <caret line="22" column="53" selection-start-line="22" selection-start-column="53" selection-end-line="22" selection-end-column="53" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cogs/bet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="447">
-              <caret line="107" column="87" lean-forward="true" selection-start-line="107" selection-start-column="87" selection-end-line="107" selection-end-column="87" />
+            <state relative-caret-position="744">
+              <caret line="141" selection-start-line="141" selection-end-line="141" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
               </folding>
@@ -125,7 +125,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>commands</find>
       <find>add</find>
       <find>!add</find>
       <find>find(</find>
@@ -155,6 +154,7 @@
       <find>aND</find>
       <find>$aND</find>
       <find>find_one</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -194,8 +194,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-75" />
-    <option name="y" value="-27" />
+    <option name="x" value="2062" />
+    <option name="y" value="-13" />
     <option name="width" value="1400" />
     <option name="height" value="1101" />
   </component>
@@ -205,6 +205,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -231,7 +232,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -485,12 +485,13 @@
       <workItem from="1615606116729" duration="474000" />
       <workItem from="1615927129092" duration="10000" />
       <workItem from="1616452079120" duration="6478000" />
-      <workItem from="1616535095606" duration="6139000" />
+      <workItem from="1616535095606" duration="6191000" />
+      <workItem from="1616629368223" duration="2491000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="268241000" />
+    <option name="totallyTimeSpent" value="270784000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -502,15 +503,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="1912" y="-9" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.06609808" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.06663113" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.28494042" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3672806" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -558,7 +559,7 @@
     <SUITE FILE_PATH="coverage/currencyBot$testScraper.coverage" NAME="testScraper Coverage Results" MODIFIED="1570941204672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/jan_bot$testing.coverage" NAME="testing Coverage Results" MODIFIED="1611776296310" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/jan_bot$tmdbTest.coverage" NAME="tmdbTest Coverage Results" MODIFIED="1612135867732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="F:/PycharmProjects/tmdb" />
-    <SUITE FILE_PATH="coverage/jan_bot$janbot.coverage" NAME="janbot Coverage Results" MODIFIED="1616553524576" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/jan_bot$janbot.coverage" NAME="janbot Coverage Results" MODIFIED="1616639277397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DiscordBot$discord.coverage" NAME="discord Coverage Results" MODIFIED="1570908798958" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/currencyBot$currencyBot.coverage" NAME="currencyBot Coverage Results" MODIFIED="1589837002563" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DiscordBot$PoeCurrencyBot.coverage" NAME="PoeCurrencyBot Coverage Results" MODIFIED="1570907970201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -678,16 +679,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/janbot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="60" column="16" lean-forward="true" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="16" />
-          <folding>
-            <element signature="e#9#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/embed.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
@@ -695,9 +686,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/janbot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1105">
+          <caret line="60" column="16" lean-forward="true" selection-start-line="60" selection-start-column="16" selection-end-line="60" selection-end-column="16" />
+          <folding>
+            <element signature="e#9#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/cogs/poe_inventory.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="362">
+        <state relative-caret-position="107">
           <caret line="38" column="31" selection-start-line="38" selection-start-column="23" selection-end-line="38" selection-end-column="31" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
@@ -707,8 +708,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cogs/bet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="447">
-          <caret line="107" column="87" lean-forward="true" selection-start-line="107" selection-start-column="87" selection-end-line="107" selection-end-column="87" />
+        <state relative-caret-position="744">
+          <caret line="141" selection-start-line="141" selection-end-line="141" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
           </folding>
