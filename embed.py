@@ -112,5 +112,12 @@ def create_poe_item_embed(found_item):
     return e
 
 
-def create_dd_embed():
-    pass
+def createBetterEmbed(better):  # better document
+    e = discord.Embed(title=better['aliases'][0], color=0xE37D30)
+    e.set_thumbnail(url=better['avatar_url'])
+    e.add_field(name="Wins", value=better['bets_won'], inline=True)
+    e.add_field(name="Losses", value=better['bets_lost'], inline=True)
+    e.add_field(name="Pushups", value=better['pushups_owed'], inline=False)
+    e.add_field(name="Pushups Lifetime", value=better['pushups_lifetime'], inline=False)
+
+    return e

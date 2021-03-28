@@ -1,6 +1,7 @@
 from discord.ext import commands
 from ext.setup import *
 from bson.objectid import ObjectId
+from embed import *
 
 class Bet(commands.Cog):
     def __init__(self, bot):
@@ -12,11 +13,13 @@ class Bet(commands.Cog):
     async def createBetter(self, ctx):
         requester_id = ctx.message.author.id
         requester_username = ctx.message.author.name
+        avatar_url = ctx.message.author.avatar_url
         if self.betters.find_one({'id': requester_id}):
             await ctx.send('{name} is already registered'.format(name=ctx.message.author.name))
         else:
             user_object = {'id': requester_id,
                            'aliases': [requester_username],
+                           'avatar_url': avatar_url,
                            'pushups_owed': 0,
                            'pushups_lifetime': 0,
                            'money_owed': 0,
@@ -75,18 +78,20 @@ class Bet(commands.Cog):
             "created_by": requester_id,
             "accepted": True
         })
+        await ctx.send("Listing Active Bets:")
         for doc in cur:
-            await ctx.send(doc)
+            await ctx.send("{team_1} vs {team_2}, Your Prediction: {prediction}, Amount: {amount}, Odds: {odds}"
+                           .format(team_1=doc['team_1'], team_2=doc['team_2'], prediction=doc['created_by_prediction'],
+                                   amount=doc['amount'], odds=doc['odds']))
 
     @commands.command(name='$winner')
     async def setWinner(self, ctx, *args):
         requester_id = ctx.message.author.id
         requester_username = ctx.message.author.name
         winnerParams = ''.join(args).split(",")
-        team_1 = winnerParams[0].upper()
-        team_2 = winnerParams[1].upper()
-        winner = winnerParams[2].upper()
-
+        team_1 = winnerParams[0]
+        team_2 = winnerParams[1]
+        winner = winnerParams[2]
         # looking for bet that does not have a winner yet
         found_bet = self.bets.find_one({
             '$and': [{"team_1": team_1},
@@ -139,3 +144,25 @@ class Bet(commands.Cog):
         else:
             await ctx.send("bet was not found")
 
+    @commands.command(name='$stats')
+    async def getStats(self, ctx, user=None):
+        requester_id = ctx.message.author.id
+        requester_username = ctx.message.author.name
+
+        if not user:  # self search
+            doc = self.betters.find_one({'id': requester_id})
+            if not doc:
+                await ctx.send('user not found')
+                return
+        else:
+            doc = self.betters.find_one(
+                {"aliases": {"$in": [user]}}
+            )
+
+        await ctx.send("W-L : {wins}-{losses}, Pushups: {pushups}"
+                       .format(wins=doc['bets_won'], losses=doc['bets_lost'], pushups=int(doc['pushups_owed'])))
+        await ctx.send(embed=createBetterEmbed(doc))
+
+    @commands.command(name='$test')
+    async def test(self, ctx):
+        pass
