@@ -25,10 +25,6 @@ load_dotenv()
 # setting up discord api info
 token = os.getenv('DISCORD_TOKEN')
 
-'''
-# setting up robinhood api info
-login = robin_stocks.login(os.getenv('ROBINHOOD_LOGIN'), os.getenv('ROBINHOOD_PW'))
-'''
 
 # setting up richard image paths
 richardPicDir = glob.glob('richardpics/*')
@@ -64,9 +60,7 @@ item_type_routes = [
     'Essence',
 ]
 
-
 currency_type_routes = ['Currency', 'Fragment']
-
 
 # connect to db
 

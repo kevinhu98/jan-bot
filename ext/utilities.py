@@ -53,8 +53,3 @@ def find(requested_item) -> bool:
             return found_item
 
     return None
-
-
-def strip(input_string):
-    return input_string.lower().replace("'", "")
-

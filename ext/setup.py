@@ -2,6 +2,8 @@ import pymongo
 import os
 from dotenv import load_dotenv
 
+# todo: probably fix this somehow
+
 def connectToPoeDB():
     try:
         load_dotenv()

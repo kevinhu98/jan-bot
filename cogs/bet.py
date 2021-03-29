@@ -38,23 +38,23 @@ class Bet(commands.Cog):
     @commands.command(name='$bet')
     async def createBet(self, ctx, *args):
         requester_id = ctx.message.author.id
-        betParams = ''.join(args).split(",")
-        if len(betParams) < 6:
+        bet_params = ''.join(args).split(",")
+        if len(bet_params) < 6:
             await ctx.send("Missing a parameter")
             return
-        elif len(betParams) > 6:
+        elif len(bet_params) > 6:
             await ctx.send("Too many parameters")
             return
-        betRatio = float(betParams[4].split(":")[1])/float(betParams[4].split(":")[0])
-        betting_against_amount = float(betParams[5]) * betRatio
+        bet_ratio = float(bet_params[4].split(":")[1])/float(bet_params[4].split(":")[0])
+        betting_against_amount = float(bet_params[5]) * bet_ratio
 
         bet_to_create = {'created_by': requester_id,
-                         'betting_against': betParams[0],
-                         'team_1': betParams[1].upper(),
-                         'team_2': betParams[2].upper(),
-                         'created_by_prediction': betParams[3].upper(),
-                         'odds': betParams[4],
-                         'amount': int(betParams[5]),
+                         'betting_against': bet_params[0],
+                         'team_1': bet_params[1].upper(),
+                         'team_2': bet_params[2].upper(),
+                         'created_by_prediction': bet_params[3].upper(),
+                         'odds': bet_params[4],
+                         'amount': int(bet_params[5]),
                          'betting_against_amount': betting_against_amount,  # amount other person is betting
                          'accepted': False,
                          'winner': None
@@ -64,12 +64,13 @@ class Bet(commands.Cog):
 
     @commands.command(name='$accept')
     async def updateAcceptedStatus(self, ctx, arg):
-        self.bets.find_one_and_update(
-            {"_id": ObjectId(arg)},
-            {"$set": {"accepted": True}})
-        await ctx.send(self.bets.find_one({"_id": ObjectId(arg)}))
-        #self.bets.find_one_and_update()
-
+        try:
+            self.bets.find_one_and_update(
+                {"_id": ObjectId(arg)},
+                {"$set": {"accepted": True}})
+            await ctx.send(self.bets.find_one({"_id": ObjectId(arg)}))
+        except:
+            await ctx.send('Game was not found')
 
     @commands.command(name='$active')
     async def listActive(self, ctx):
@@ -86,12 +87,10 @@ class Bet(commands.Cog):
 
     @commands.command(name='$winner')
     async def setWinner(self, ctx, *args):
-        requester_id = ctx.message.author.id
-        requester_username = ctx.message.author.name
-        winnerParams = ''.join(args).split(",")
-        team_1 = winnerParams[0]
-        team_2 = winnerParams[1]
-        winner = winnerParams[2]
+        winner_params = ''.join(args).split(",")
+        team_1 = winner_params[0]
+        team_2 = winner_params[1]
+        winner = winner_params[2]
         # looking for bet that does not have a winner yet
         found_bet = self.bets.find_one({
             '$and': [{"team_1": team_1},
@@ -147,7 +146,6 @@ class Bet(commands.Cog):
     @commands.command(name='$stats')
     async def getStats(self, ctx, user=None):
         requester_id = ctx.message.author.id
-        requester_username = ctx.message.author.name
 
         if not user:  # self search
             doc = self.betters.find_one({'id': requester_id})
@@ -159,10 +157,4 @@ class Bet(commands.Cog):
                 {"aliases": {"$in": [user]}}
             )
 
-        await ctx.send("W-L : {wins}-{losses}, Pushups: {pushups}"
-                       .format(wins=doc['bets_won'], losses=doc['bets_lost'], pushups=int(doc['pushups_owed'])))
         await ctx.send(embed=createBetterEmbed(doc))
-
-    @commands.command(name='$test')
-    async def test(self, ctx):
-        pass
