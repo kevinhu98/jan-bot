@@ -27,20 +27,23 @@ token = os.getenv('DISCORD_TOKEN')
 
 
 # setting up richard image paths
-richardPicDir = glob.glob('richardpics/*')
 richardPics = []
-for path in richardPicDir:
+for path in glob.glob("richardpics/*"):
     richardPics.append(path.replace('\\', '/'))
 
+# setting up gunmo image paths
+gunmoPics = []
+for path in glob.glob('gunmopics/*'):
+    gunmoPics.append(path.replace('\\', '/'))
 
 # setting up interview questions
-with open('text_file_resources/interviewquestions.txt') as f:
-    interviewQuestions = [question for question in f]
+# with open('text_file_resources/interviewquestions.txt') as f:
+#     interviewQuestions = [question for question in f]
 
 
 # setting up poe ninja routes and league info
 # todo: auto update current_league
-current_league = 'Ritual'
+current_league = 'Expedition'
 item_type_routes = [
     'UniqueWeapon',
     'DivinationCard',
@@ -85,9 +88,7 @@ async def help_embed(ctx):
     embedVar.add_field(name="ci 'item' 'optional: 0l,5l,6l'", value='Returns the chaos orb equivalent of item', inline=False)
     embedVar.add_field(name="ei 'item'", value='Returns the exalted orb equivalent of item', inline=False)
     embedVar.add_field(name="id 'item", value='Info about item (supports uniques, divination cards, and prophecies)', inline=False)
-    embedVar.add_field(name='!stonks', value='Displays portfolio value', inline=False)
-    embedVar.add_field(name='!positions', value='Displays account positions', inline=False)
-    embedVar.add_field(name='!richard', value='Random richard picture', inline=False)
+
     await ctx.send(embed=embedVar)
 
 
@@ -131,6 +132,7 @@ async def item_exalt_price(ctx, *args):
 
             else:  # if no listed links, assume 0 links
                 for item in r.json()['lines']:
+                    item['links'] = 0  # bad workaround after api updated to remove links
                     if (item['name'].replace("'", '').lower() in [requested_item, requested_item.replace("'", '').lower()]) and str(item['links']) == str(0):
                         return_statement = 'A {arg1} linked {arg2} is currently worth {arg3} exalted orbs.'.format(arg1=str(item['links']), arg2=item['name'], arg3=str(item['exaltedValue']))
                         return await ctx.send(return_statement)
@@ -273,7 +275,6 @@ async def positions(ctx, *args):
 async def hello(ctx):
     await ctx.send('Hello, {name}'.format(name=ctx.message.author.name))
 
-
 @bot.command(name='choke')
 async def choke(ctx):
     await ctx.send(file=discord.File('richardpics/richardchoke.jpg'))
@@ -304,6 +305,9 @@ async def gunmo(ctx):
 async def randomRichard(ctx):
     await ctx.send(file=discord.File(random.choice(richardPics)))
 
+@bot.command(name='pic')
+async def gunmoPic(ctx):
+    await ctx.send(file=discord.File(random.choice(gunmoPics)))
 
 @bot.command(name='poggers')
 async def ryanO(ctx):
@@ -325,9 +329,9 @@ async def sike(ctx):
     await ctx.send(file=discord.File('images/sike.png'))
 
 
-@bot.command(name='!question')
-async def interviewquestion(ctx):
-    await ctx.send(random.choice(interviewQuestions))
+# @bot.command(name='!question')
+# async def interviewquestion(ctx):
+#     await ctx.send(random.choice(interviewQuestions))
 
 
 @bot.command(name='commit')

@@ -1,13 +1,12 @@
 import requests
 
-current_league = "Ritual"
+current_league = "Expedition"
 item_type_routes = ["UniqueWeapon", "DivinationCard", "UniqueArmour", "UniqueAccessory", "UniqueJewel", "UniqueFlask", "UniqueMap",
                     "Oil", "Incubator", "Scarab", "SkillGem", "Fossil", "Resonator", "Prophecy", "Beast", "Essence"]
 
 currency_type_routes = ["Currency", "Fragment"]
 
 # todo: add stripped function to replace "'" and lower
-
 
 def price_check(requested_item):  # modes are chaos, exalt, both
     for item_type in item_type_routes:
@@ -27,6 +26,7 @@ def price_check(requested_item):  # modes are chaos, exalt, both
                         return return_statement
             else:  # if no listed links, assume 0 links
                 for item in r.json()['lines']:
+                    item['links'] = 0  # bad workaround after api updated to remove links
                     if (item['name'].replace("'", '').lower() in [requested_item,
                                                                   requested_item.replace("'", '').lower()]) and str(
                             item['links']) == str(0):

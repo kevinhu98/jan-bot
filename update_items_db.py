@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-current_league = 'Ritual'
+current_league = 'Expedition'
 item_type_routes = [
     'UniqueWeapon',
     'DivinationCard',
